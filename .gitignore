@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------
+# PADRON REAL - NUNCA AL REPO
+# La planilla de la parroquia tiene DNI, pagos y restricciones
+# alimentarias. Nada de eso entra acá. Si alguna vez necesitás
+# guardar un padrón para probar, usá datos/padron-ejemplo.csv,
+# que es inventado.
+# ---------------------------------------------------------------
+*.csv
+*.xlsx
+*.xls
+*.ods
+!datos/padron-ejemplo.csv
+datos/real/
+
+# secretos
+.env
+.env.*
+!.env.example
+
+# build / deps
+node_modules/
+dist/
+dist-ssr/
+dev-dist/
+*.local
+.vercel
+.netlify
+
+# editores y SO
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+.vercel
+.env*
+!.env.example
+
+# generado por la compilación
+*.tsbuildinfo

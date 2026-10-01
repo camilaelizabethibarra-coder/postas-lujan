@@ -1,0 +1,144 @@
+/*
+ * Paleta heredada del prototipo. Dos criterios la gobiernan:
+ *  - de día, con sol, contra la pantalla: contraste alto, nada de gris claro
+ *    sobre blanco.
+ *  - de noche, caminando: nada de blanco puro a pantalla completa.
+ * El modo oscuro sigue al sistema, y se puede forzar con data-theme.
+ */
+:root {
+  --fondo: #f4f7fc;
+  --sup: #ffffff;
+  --sup2: #e4edf9;
+  --texto: #0b1830;
+  --tenue: #5b7196;
+  --celeste: #1f6ba6;
+  --celeste-suave: #d8e9f7;
+  --ok: #17703f;
+  --ok-suave: #d6f0e1;
+  --vela: #a36a05;
+  --alerta: #b33e27;
+  --alerta-suave: #fbe3dd;
+  --borde: rgba(11, 24, 48, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fondo: #0b1830;
+    --sup: #132648;
+    --sup2: #1c3462;
+    --texto: #eaf2fb;
+    --tenue: #93aacb;
+    --celeste: #7ec0f2;
+    --celeste-suave: #1c3462;
+    --ok: #66d19e;
+    --ok-suave: #12372a;
+    --vela: #f0b54b;
+    --alerta: #f2856e;
+    --alerta-suave: #3a1e19;
+    --borde: rgba(126, 192, 242, 0.18);
+  }
+}
+
+:root[data-theme='dark'] {
+  --fondo: #0b1830;
+  --sup: #132648;
+  --sup2: #1c3462;
+  --texto: #eaf2fb;
+  --tenue: #93aacb;
+  --celeste: #7ec0f2;
+  --celeste-suave: #1c3462;
+  --ok: #66d19e;
+  --ok-suave: #12372a;
+  --vela: #f0b54b;
+  --alerta: #f2856e;
+  --alerta-suave: #3a1e19;
+  --borde: rgba(126, 192, 242, 0.18);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+  /* que un toque repetido no seleccione texto ni haga zoom */
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  max-width: 540px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; text-align: left; }
+input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
+
+.cpo { flex: 1; padding: 14px 16px 96px; }
+.centro { padding: 26px 18px; text-align: center; }
+.centro .g { font-size: 26px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.02em; }
+.centro .s { color: var(--tenue); font-size: 14px; }
+
+.h { font-size: 13px; color: var(--tenue); margin: 22px 0 9px; font-weight: 600; }
+.h:first-child { margin-top: 2px; }
+
+.caja { background: var(--sup); border: 1px solid var(--borde); border-radius: 14px; padding: 15px; }
+
+.btn {
+  display: block; width: 100%;
+  background: var(--celeste); color: var(--fondo);
+  font-weight: 700; padding: 15px; border-radius: 12px;
+  font-size: 15px; text-align: center;
+}
+.btn.sec { background: var(--sup2); color: var(--texto); font-weight: 600; }
+.btn[disabled] { opacity: 0.4; }
+.btn + .btn { margin-top: 9px; }
+
+.busc {
+  width: 100%; background: var(--sup); border: 1px solid var(--borde);
+  border-radius: 12px; padding: 13px 14px;
+  /* 16px o más: abajo de eso, iOS hace zoom al enfocar el campo */
+  font-size: 16px;
+}
+
+.area {
+  width: 100%; min-height: 150px;
+  background: var(--fondo); border: 1px solid var(--borde);
+  border-radius: 10px; padding: 11px; font-size: 13px; resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.aviso { font-size: 13px; color: var(--tenue); line-height: 1.6; margin: 0 0 11px; }
+.vac { text-align: center; padding: 44px 20px; color: var(--tenue); font-size: 14px; line-height: 1.6; }
+
+/* avisos del importador */
+.nota {
+  display: flex; gap: 9px; align-items: flex-start;
+  font-size: 13px; line-height: 1.5; padding: 10px 12px;
+  border-radius: 10px; background: var(--sup2); margin-bottom: 7px;
+}
+.nota.ojo { background: var(--alerta-suave); }
+.nota b { flex: none; }
+
+.estado { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--tenue); }
+.pt { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex: none; }
+.pt.esp { background: var(--vela); }
+.pt.loc { background: var(--tenue); }
+
+.pie { padding: 16px; text-align: center; }
+
+.err { color: var(--alerta); font-size: 14px; margin-top: 10px; font-weight: 600; }
+
+/* teclado numérico del PIN */
+.pin {
+  width: 100%; text-align: center; letter-spacing: 0.4em;
+  font-size: 28px; padding: 16px; border-radius: 12px;
+  background: var(--sup); border: 1px solid var(--borde);
+}

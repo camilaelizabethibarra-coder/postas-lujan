@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Postas — Peregrinación a Luján</title>
+<style>
+:root{
+  --fondo:#F4F7FC; --sup:#FFFFFF; --sup2:#E4EDF9;
+  --texto:#0B1830; --tenue:#5B7196;
+  --celeste:#1F6BA6; --celeste-suave:#D8E9F7;
+  --ok:#17703F; --ok-suave:#D6F0E1;
+  --vela:#A36A05; --alerta:#B33E27; --alerta-suave:#FBE3DD;
+  --borde:rgba(11,24,48,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --fondo:#0B1830; --sup:#132648; --sup2:#1C3462;
+    --texto:#EAF2FB; --tenue:#93AACB;
+    --celeste:#7EC0F2; --celeste-suave:#1C3462;
+    --ok:#66D19E; --ok-suave:#12372A;
+    --vela:#F0B54B; --alerta:#F2856E; --alerta-suave:#3A1E19;
+    --borde:rgba(126,192,242,.18);
+  }
+}
+:root[data-theme="dark"]{
+  --fondo:#0B1830; --sup:#132648; --sup2:#1C3462;
+  --texto:#EAF2FB; --tenue:#93AACB;
+  --celeste:#7EC0F2; --celeste-suave:#1C3462;
+  --ok:#66D19E; --ok-suave:#12372A;
+  --vela:#F0B54B; --alerta:#F2856E; --alerta-suave:#3A1E19;
+  --borde:rgba(126,192,242,.18);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--fondo); color:var(--texto);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+#app{max-width:540px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--celeste);outline-offset:2px;border-radius:6px}
+
+.cab{position:sticky;top:0;z-index:5;background:var(--fondo);
+  padding:14px 16px 12px;border-bottom:1px solid var(--borde)}
+.postas-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.ptab{flex:none;padding:8px 13px;border-radius:999px;background:var(--sup);
+  font-size:13px;color:var(--tenue);white-space:nowrap;border:1px solid var(--borde)}
+.ptab.act{background:var(--celeste);color:var(--fondo);font-weight:650;border-color:transparent}
+
+.cont{display:flex;align-items:baseline;gap:8px;margin:14px 0 8px}
+.cont .n{font-size:46px;font-weight:700;line-height:.9;letter-spacing:-.03em}
+.cont .de{font-size:15px;color:var(--tenue)}
+.cont .fa{margin-left:auto;font-size:14px;color:var(--vela);font-weight:600}
+
+.ticks{display:flex;flex-wrap:wrap;gap:2px;margin-top:4px}
+.tk{width:6px;height:13px;border-radius:1px;background:var(--sup2)}
+.tk.on{background:var(--celeste)}
+.tk.dijo{background:var(--ok)}
+
+.estado{margin-top:10px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tenue)}
+.pt{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none}
+.pt.esp{background:var(--vela)} .pt.loc{background:var(--tenue)}
+
+.cpo{flex:1;padding:14px 16px 96px}
+.busc{width:100%;background:var(--sup);border:1px solid var(--borde);
+  border-radius:12px;padding:13px 14px;font-size:16px}
+.chips{display:flex;gap:8px;margin:10px 0 14px}
+.chip{padding:7px 13px;border-radius:999px;background:var(--sup);font-size:13px;
+  color:var(--tenue);border:1px solid var(--borde)}
+.chip.act{background:var(--celeste);color:var(--fondo);font-weight:650;border-color:transparent}
+
+.fila{display:flex;align-items:center;gap:12px;width:100%;padding:13px 12px;
+  border-radius:12px;background:var(--sup);margin-bottom:7px;
+  border:1px solid var(--borde);border-left:3px solid transparent}
+.fila.on{background:var(--celeste-suave);border-left-color:var(--celeste)}
+.fila.dijo{border-left-color:var(--ok)}
+.num{flex:none;width:36px;font-size:13px;color:var(--tenue);font-weight:600}
+.nom{flex:1;min-width:0;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nom small{display:block;font-size:11px;color:var(--tenue);font-weight:400;margin-top:2px}
+.mar{flex:none;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--borde);
+  display:grid;place-items:center;font-size:15px}
+.fila.on .mar{background:var(--celeste);border-color:var(--celeste);color:var(--fondo);font-weight:800}
+.fila.dijo .mar{background:var(--ok);border-color:var(--ok)}
+
+.tabs{position:sticky;bottom:0;display:flex;background:var(--fondo);
+  border-top:1px solid var(--borde);padding:6px 4px calc(10px + env(safe-area-inset-bottom))}
+.tab{flex:1;padding:8px 2px;font-size:11px;color:var(--tenue);text-align:center;
+  line-height:1.5;position:relative}
+.tab i{display:block;font-size:17px;font-style:normal}
+.tab.act{color:var(--celeste);font-weight:650}
+.dot{position:absolute;top:4px;right:calc(50% - 24px);width:8px;height:8px;
+  border-radius:50%;background:var(--alerta)}
+
+.vac{text-align:center;padding:44px 20px;color:var(--tenue);font-size:14px;line-height:1.6}
+.h{font-size:13px;color:var(--tenue);margin:22px 0 9px;font-weight:600}
+.h:first-child{margin-top:2px}
+.caja{background:var(--sup);border:1px solid var(--borde);border-radius:14px;padding:15px}
+.btn{display:block;width:100%;background:var(--celeste);color:var(--fondo);font-weight:700;
+  padding:15px;border-radius:12px;font-size:15px;text-align:center}
+.btn.sec{background:var(--sup2);color:var(--texto);font-weight:600}
+.btn[disabled]{opacity:.4}
+.btn+.btn{margin-top:9px}
+.area{width:100%;min-height:120px;background:var(--fondo);border:1px solid var(--borde);
+  border-radius:10px;padding:11px;font-size:13px;resize:vertical;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.res{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--borde)}
+.res:last-child{border-bottom:none}
+.res .nm{flex:1;font-size:14px}
+.res .ct{font-size:14px;font-weight:650}
+.bar{width:60px;height:6px;border-radius:3px;background:var(--sup2);overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:var(--celeste)}
+.aviso{font-size:13px;color:var(--tenue);line-height:1.6;margin:0 0 11px}
+
+.grp{margin-bottom:18px}
+.grp h4{margin:0 0 8px;font-size:14px;font-weight:650;display:flex;align-items:center;gap:8px}
+.grp h4 em{font-style:normal;font-size:12px;color:var(--tenue);font-weight:500}
+.grp.atras h4{color:var(--vela)}
+.gente{display:flex;flex-wrap:wrap;gap:6px}
+.per{background:var(--sup);border:1px solid var(--borde);border-radius:8px;
+  padding:6px 10px;font-size:13px}
+.grp.atras .per{background:var(--alerta-suave);border-color:transparent}
+.avi{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;
+  background:var(--alerta-suave);border-left:3px solid var(--alerta);margin-bottom:7px}
+.pill{flex:none;font-size:12px;color:var(--celeste);padding:7px 11px;
+  border:1px solid var(--borde);border-radius:999px;text-decoration:none;background:var(--sup)}
+
+.centro{padding:26px 18px;text-align:center}
+.centro .g{font-size:26px;font-weight:700;margin:6px 0 2px;letter-spacing:-.02em}
+.centro .s{color:var(--tenue);font-size:14px}
+.rotulo{font-size:12px;letter-spacing:.09em;color:var(--tenue);font-weight:650;margin-top:22px}
+.proxima{font-size:30px;font-weight:750;letter-spacing:-.02em;margin:3px 0 16px}
+.gigante{width:100%;padding:34px 18px;border-radius:22px;background:var(--celeste);
+  color:var(--fondo);font-size:22px;font-weight:750;line-height:1.25;text-align:center}
+.gigante.hecho{background:var(--ok-suave);color:var(--ok);border:1px solid var(--ok)}
+.ok{margin-top:14px;color:var(--ok);font-size:15px;font-weight:600}
+.link{color:var(--celeste);font-size:13px;text-decoration:underline;display:inline-block;margin-top:8px}
+.ruta{margin-top:26px;text-align:left}
+.paso{display:flex;gap:12px;align-items:center;padding:9px 0;font-size:15px}
+.bol{width:12px;height:12px;border-radius:50%;background:var(--sup2);flex:none}
+.bol.on{background:var(--celeste)}
+.bol.dijo{background:var(--ok)}
+.paso.pend{color:var(--tenue)}
+.hora{font-size:12px;color:var(--tenue)}
+.sug{width:100%;padding:13px 12px;border-radius:12px;background:var(--sup);
+  border:1px solid var(--borde);margin-bottom:7px;font-size:16px;display:block}
+.pie{padding:16px;text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+
+var POSTAS = [
+  {id:"po1", nombre:"Morón — salida"},
+  {id:"po2", nombre:"La Reja"},
+  {id:"po3", nombre:"General Rodríguez"},
+  {id:"po4", nombre:"Luján — llegada"},
+  {id:"po5", nombre:"Luján — subida al micro"}
+];
+
+var EJEMPLO = [
+  [1,"PEREZ","ANA",1],[2,"GOMEZ","LUIS",1],[3,"SOSA","MARTA",1],[4,"DIAZ","JUAN",1],
+  [5,"ROMERO","SOFIA",1],[6,"LOPEZ","MATEO",2],[7,"SILVA","CAMILA",2],[8,"TORRES","DIEGO",2],
+  [9,"MOLINA","JULIETA",2],[10,"VEGA","NICOLAS",2],[11,"CASTRO","LUCIA",3],[12,"HERRERA","PABLO",3],
+  [13,"AGUIRRE","VALENTINA",3],[14,"MEDINA","SANTIAGO",3],[15,"RIOS","FLORENCIA",3]
+].map(function(f){ return {n:f[0], apellido:f[1], nombre:f[2], micro:f[3], tel:""}; });
+
+var S = {
+  pantalla: "inicio",
+  vista: "marcar",
+  postaSel: 0,
+  padron: [],
+  marcas: {},
+  avisos: [],
+  miNum: "",
+  busq: "",
+  buscaNombre: "",
+  pegado: "",
+  filtro: "faltan",
+  conexion: "esperando",
+  ultima: null,
+  pidiendo: null
+};
+
+try { S.miNum = localStorage.getItem("postas-mi-numero") || ""; } catch(e){}
+if (S.miNum) S.pantalla = "peregrino";
+
+var app = document.getElementById("app");
+var db = null;
+
+/* ------------------------------ utilidades ------------------------------ */
+
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function hora(t){
+  try { return new Date(t).toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"}); }
+  catch(e){ return ""; }
+}
+function marcaDe(postaId, num){
+  var m = S.marcas[postaId];
+  return m ? m[String(num)] : null;
+}
+function pasaron(postaId){
+  var m = S.marcas[postaId] || {}, c = 0;
+  for (var k in m) if (m[k] && m[k].p) c++;
+  return c;
+}
+function ultimaPostaDe(num){
+  var u = -1;
+  POSTAS.forEach(function(p,i){ var m = marcaDe(p.id,num); if (m && m.p) u = i; });
+  return u;
+}
+function proximaPosta(num){
+  for (var i=0;i<POSTAS.length;i++){
+    var m = marcaDe(POSTAS[i].id, num);
+    if (!m || !m.p) return i;
+  }
+  return -1;
+}
+function personaDe(num){
+  for (var i=0;i<S.padron.length;i++) if (String(S.padron[i].n)===String(num)) return S.padron[i];
+  return null;
+}
+
+/* ----------------------------- base de datos ----------------------------- */
+
+if (window.claude && typeof window.claude.use === "function") {
+  window.claude.use("db").then(function(d){
+    if (!d) { S.conexion = "local"; render(); return; }
+    db = d; S.conexion = "ok";
+    suscribir();
+    render();
+  }).catch(function(){ S.conexion = "local"; render(); });
+} else {
+  S.conexion = "local";
+}
+
+function suscribir(){
+  db.doc("padron/lista").onSnapshot(function(snap){
+    var d = snap.exists ? snap.data() : null;
+    S.padron = (d && Array.isArray(d.gente)) ? d.gente : [];
+    render();
+  }, function(){ S.conexion = "local"; render(); });
+
+  POSTAS.forEach(function(p){
+    db.doc("marcas/"+p.id).onSnapshot(function(snap){
+      S.marcas[p.id] = snap.exists ? snap.data() : {};
+      render();
+    }, function(){});
+  });
+
+  db.collection("avisos").orderBy("t","desc").limit(50).onSnapshot(function(snap){
+    S.avisos = snap.docs.map(function(d){
+      var b = d.data() || {};
+      return {id:d.id, n:b.n, tipo:b.tipo, t:b.t, desde:b.desde, ok:!!b.ok};
+    });
+    render();
+  }, function(){});
+}
+
+function escribirMarca(postaId, num, cuerpo){
+  if (!db) return;
+  var ref = db.doc("marcas/"+postaId);
+  var body = {}; body[String(num)] = cuerpo;
+  ref.update(body).catch(function(){
+    var lleno = {};
+    var actual = S.marcas[postaId] || {};
+    for (var k in actual) lleno[k] = actual[k];
+    lleno[String(num)] = cuerpo;
+    ref.set(lleno).catch(function(){});
+  });
+}
+
+function marcar(num, postaId, via, valor){
+  var actual = marcaDe(postaId, num);
+  var p = (valor === undefined) ? !(actual && actual.p) : valor;
+  var cuerpo = {p:p, t:Date.now(), via:via};
+  if (!S.marcas[postaId]) S.marcas[postaId] = {};
+  S.marcas[postaId][String(num)] = cuerpo;
+  escribirMarca(postaId, num, cuerpo);
+}
+
+function guardarPadron(lista){
+  S.padron = lista;
+  if (db) db.doc("padron/lista").set({gente:lista, t:Date.now()}).catch(function(){});
+}
+
+function crearAviso(tipo){
+  var nuevo = {
+    n: Number(S.miNum), tipo: tipo, t: Date.now(),
+    desde: (function(){ var i = ultimaPostaDe(S.miNum); return i>=0 ? POSTAS[i].nombre : null; })(),
+    ok: false
+  };
+  S.avisos.unshift({id:"tmp"+Date.now(), n:nuevo.n, tipo:tipo, t:nuevo.t, desde:nuevo.desde, ok:false});
+  if (db) db.collection("avisos").add(nuevo).catch(function(){});
+}
+
+function resolverAviso(id){
+  S.avisos = S.avisos.map(function(a){ return a.id===id ? Object.assign({},a,{ok:true}) : a; });
+  if (db && id.indexOf("tmp")!==0) db.doc("avisos/"+id).update({ok:true}).catch(function(){});
+}
+
+/* -------------------------------- pantallas -------------------------------- */
+
+function vistaInicio(){
+  return '<div class="centro" style="margin-top:36px">' +
+    '<div class="g">Postas</div>' +
+    '<div class="s" style="margin-bottom:28px">Peregrinación a Luján · 3 de octubre</div>' +
+    '<button class="btn" data-a="rol:peregrino">Soy peregrino</button>' +
+    '<button class="btn sec" data-a="rol:responsable">Soy responsable de posta</button>' +
+    '</div>' + pie();
+}
+
+function pie(){
+  var txt = S.conexion==="ok" ? "Todo se comparte con el resto del equipo"
+          : S.conexion==="esperando" ? "Conectando…"
+          : "Modo local: lo que marques queda solo en este celular";
+  return '<div class="pie"><span class="estado" style="justify-content:center">' +
+    '<span class="pt ' + (S.conexion==="ok"?"":S.conexion==="esperando"?"esp":"loc") + '"></span>' +
+    esc(txt) + '</span></div>';
+}
+
+/* --- peregrino --- */
+
+function vistaQuienSos(){
+  var q = S.buscaNombre.trim().toLowerCase();
+  var sug = "";
+  if (q && S.padron.length){
+    var ms = S.padron.filter(function(p){
+      return String(p.n)===q || (p.apellido+" "+p.nombre).toLowerCase().indexOf(q)>=0;
+    }).slice(0,6);
+    sug = ms.map(function(p){
+      return '<button class="sug" data-a="soy:'+p.n+'"><b>'+esc(p.apellido)+', '+esc(p.nombre)+'</b>' +
+        ' <span style="color:var(--tenue);font-size:13px">nº '+p.n+'</span></button>';
+    }).join("");
+    if (!ms.length) sug = '<div class="vac">No encontré a nadie con eso.</div>';
+  }
+  var soloNum = /^\d+$/.test(S.buscaNombre.trim());
+  return '<div class="centro">' +
+    '<div class="g">¿Quién sos?</div>' +
+    '<div class="s" style="margin-bottom:18px">Escribí tu apellido o tu número de lista</div>' +
+    '<input class="busc" id="quien" placeholder="Pérez" value="'+esc(S.buscaNombre)+'" ' +
+      'autocomplete="off" style="text-align:center;font-size:19px;padding:16px">' +
+    '<div style="margin-top:12px;text-align:left">'+sug+'</div>' +
+    (soloNum && !S.padron.length
+      ? '<button class="btn" style="margin-top:12px" data-a="soy:'+esc(S.buscaNombre.trim())+'">Soy el número '+esc(S.buscaNombre.trim())+'</button>'
+      : '') +
+    '<button class="btn sec" style="margin-top:20px" data-a="rol:ninguno">Volver</button>' +
+    '</div>' + pie();
+}
+
+function vistaPeregrino(){
+  if (!S.miNum) return vistaQuienSos();
+  var yo = personaDe(S.miNum);
+  var prox = proximaPosta(S.miNum);
+  var recien = S.ultima && (Date.now() - S.ultima.t < 120000) ? S.ultima : null;
+
+  var botonera;
+  if (prox < 0){
+    botonera = '<div class="gigante hecho">Pasaste por todas las postas</div>';
+  } else {
+    botonera =
+      '<div class="rotulo">PRÓXIMA POSTA</div>' +
+      '<div class="proxima">'+esc(POSTAS[prox].nombre)+'</div>' +
+      '<button class="gigante" data-a="llegue:'+POSTAS[prox].id+'">Llegué a '+esc(POSTAS[prox].nombre.split(" — ")[0])+'</button>';
+  }
+
+  var confirma = recien
+    ? '<div class="ok">✓ Quedaste marcado en '+esc(recien.nombre)+'</div>' +
+      '<button class="link" data-a="deshacer:'+recien.id+'">Me equivoqué, borralo</button>'
+    : "";
+
+  var ruta = POSTAS.map(function(p,i){
+    var m = marcaDe(p.id, S.miNum);
+    var on = m && m.p;
+    return '<div class="paso'+(on?"":" pend")+'">' +
+      '<span class="bol'+(on?(m.via==="resp"?" on":" dijo"):"")+'"></span>' +
+      '<span style="flex:1">'+esc(p.nombre)+'</span>' +
+      (on ? '<span class="hora">'+hora(m.t)+'</span>' : '') +
+      '</div>';
+  }).join("");
+
+  var pedido = S.pidiendo
+    ? '<div class="caja" style="margin-top:20px;text-align:left">' +
+      '<p class="aviso">' + (S.pidiendo==="ayuda"
+        ? "El equipo va a ver que necesitás ayuda y por dónde pasaste la última vez."
+        : "El equipo va a ver que no seguís caminando, para pasar a buscarte.") + '</p>' +
+      '<button class="btn" data-a="confirmar">Sí, avisar</button>' +
+      '<button class="btn sec" data-a="cancelar">Mejor no</button></div>'
+    : '<button class="btn sec" style="margin-top:22px" data-a="pedir:bajo">No puedo seguir</button>' +
+      '<button class="btn sec" data-a="pedir:ayuda">Necesito ayuda</button>';
+
+  var avisoMio = S.avisos.filter(function(a){ return String(a.n)===String(S.miNum) && !a.ok; })[0];
+  var avisoTxt = avisoMio
+    ? '<div class="caja" style="margin-top:14px;background:var(--alerta-suave);border:none">' +
+      '<div style="font-size:14px">Ya avisaste al equipo a las '+hora(avisoMio.t)+'. Quedate donde estás.</div></div>'
+    : "";
+
+  return '<div class="centro">' +
+    '<div class="s">Peregrino '+esc(S.miNum)+(yo?' · '+esc(yo.nombre)+' '+esc(yo.apellido):'')+'</div>' +
+    botonera + confirma + avisoTxt +
+    '<div class="ruta">'+ruta+'</div>' +
+    pedido +
+    '<button class="btn sec" style="margin-top:24px;opacity:.6" data-a="salir">Salir</button>' +
+    '</div>' + pie();
+}
+
+/* --- responsable --- */
+
+function htmlCabecera(){
+  var posta = POSTAS[S.postaSel];
+  var n = pasaron(posta.id);
+  var faltan = Math.max(S.padron.length - n, 0);
+  var tabs = POSTAS.map(function(p,i){
+    return '<button class="ptab'+(i===S.postaSel?" act":"")+'" data-a="posta:'+i+'">'+esc(p.nombre)+'</button>';
+  }).join("");
+  var ticks = S.padron.map(function(p){
+    var m = marcaDe(posta.id, p.n);
+    return '<span class="tk'+(m&&m.p ? (m.via==="resp"?" on":" dijo") : "")+'"></span>';
+  }).join("");
+  return '<div class="postas-tabs">'+tabs+'</div>' +
+    '<div class="cont"><span class="n">'+n+'</span>' +
+    '<span class="de">de '+S.padron.length+' pasaron</span>' +
+    (faltan? '<span class="fa">faltan '+faltan+'</span>' : '') + '</div>' +
+    '<div class="ticks">'+ticks+'</div>';
+}
+
+function htmlLista(){
+  var posta = POSTAS[S.postaSel];
+  var q = S.busq.trim().toLowerCase();
+  var lista = S.padron.filter(function(p){
+    var m = marcaDe(posta.id, p.n);
+    var on = !!(m && m.p);
+    if (S.filtro==="faltan" && on) return false;
+    if (S.filtro==="pasaron" && !on) return false;
+    if (!q) return true;
+    return String(p.n)===q || (p.apellido+" "+p.nombre).toLowerCase().indexOf(q)>=0;
+  }).sort(function(a,b){ return a.n-b.n; });
+
+  if (!lista.length){
+    return '<div class="vac">'+(S.filtro==="faltan"?"Pasaron todos por acá.":"Nada para mostrar.")+'</div>';
+  }
+  return lista.map(function(p){
+    var m = marcaDe(posta.id, p.n);
+    var on = !!(m && m.p);
+    var cls = "fila" + (on ? " on" : "") + (on && m.via!=="resp" ? " dijo" : "");
+    return '<button class="'+cls+'" data-a="marcar:'+p.n+'">' +
+      '<span class="num">'+p.n+'</span>' +
+      '<span class="nom">'+esc(p.apellido)+', '+esc(p.nombre)+
+        (on ? '<small>'+(m.via==="resp"?"lo marcaste vos":"lo dijo el peregrino")+' · '+hora(m.t)+'</small>' : '') +
+      '</span><span class="mar">'+(on?"✓":"")+'</span></button>';
+  }).join("");
+}
+
+function vistaMarcar(){
+  if (!S.padron.length){
+    return '<div class="cpo"><div class="vac">Todavía no hay padrón cargado.<br>Andá a Datos y pegá la lista.</div></div>';
+  }
+  return '<div class="cab" id="cab">'+htmlCabecera()+'</div>' +
+    '<div class="cpo">' +
+    '<input class="busc" id="busq" placeholder="Buscar por apellido o número" value="'+esc(S.busq)+'" autocomplete="off">' +
+    '<div class="chips">' +
+      ['faltan','todos','pasaron'].map(function(k){
+        var t = k==="faltan"?"Faltan":k==="todos"?"Todos":"Pasaron";
+        return '<button class="chip'+(S.filtro===k?" act":"")+'" data-a="filtro:'+k+'">'+t+'</button>';
+      }).join("") +
+    '</div><div id="lista">'+htmlLista()+'</div></div>';
+}
+
+function vistaDonde(){
+  var pendientes = S.avisos.filter(function(a){ return !a.ok; });
+  var ultimas = {};
+  S.padron.forEach(function(p){ ultimas[p.n] = ultimaPostaDe(p.n); });
+  var frente = -1;
+  S.padron.forEach(function(p){ if (ultimas[p.n] > frente) frente = ultimas[p.n]; });
+
+  var grupos = "";
+  for (var i = POSTAS.length-1; i >= 0; i--){
+    var gente = S.padron.filter(function(p){ return ultimas[p.n] === i; });
+    if (!gente.length) continue;
+    var atras = (frente - i) >= 2;
+    grupos += '<div class="grp'+(atras?" atras":"")+'">' +
+      '<h4>'+esc(POSTAS[i].nombre)+' <em>'+gente.length+'</em>'+(atras?' <em>quedaron atrás</em>':'')+'</h4>' +
+      '<div class="gente">'+gente.map(function(p){
+        return '<span class="per">'+p.n+' '+esc(p.apellido)+'</span>';
+      }).join("")+'</div></div>';
+  }
+  var sin = S.padron.filter(function(p){ return ultimas[p.n] === -1; });
+  if (sin.length){
+    grupos += '<div class="grp atras"><h4>Sin ningún registro <em>'+sin.length+'</em></h4>' +
+      '<div class="gente">'+sin.map(function(p){
+        return '<span class="per">'+p.n+' '+esc(p.apellido)+'</span>';
+      }).join("")+'</div></div>';
+  }
+
+  var avisosHtml = pendientes.length
+    ? '<div class="h" style="color:var(--alerta)">Pidieron ayuda</div>' +
+      pendientes.map(function(a){
+        var p = personaDe(a.n);
+        return '<div class="avi"><span class="nom">'+a.n+' '+(p?esc(p.apellido)+', '+esc(p.nombre):'')+
+          '<small>'+(a.tipo==="ayuda"?"necesita ayuda":"no puede seguir")+
+          (a.desde?' · pasó por '+esc(a.desde):' · sin registro')+' · '+hora(a.t)+'</small></span>' +
+          (p && p.tel ? '<a class="pill" href="tel:'+esc(p.tel)+'">Llamar</a>' : '') +
+          '<button class="pill" data-a="resolver:'+esc(a.id)+'">Listo</button></div>';
+      }).join("")
+    : "";
+
+  var resumen = POSTAS.map(function(p){
+    var c = pasaron(p.id);
+    var pct = S.padron.length ? Math.round(c*100/S.padron.length) : 0;
+    return '<div class="res"><span class="nm">'+esc(p.nombre)+'</span>' +
+      '<span class="bar"><i style="width:'+pct+'%"></i></span><span class="ct">'+c+'</span></div>';
+  }).join("");
+
+  return '<div class="cpo">' + avisosHtml +
+    '<div class="h">Última posta por la que pasó cada uno</div>' +
+    (S.padron.length ? grupos : '<div class="vac">Cargá el padrón para ver esto.</div>') +
+    '<div class="h">Cuántos pasaron por cada posta</div><div class="caja">'+resumen+'</div></div>';
+}
+
+function vistaDatos(){
+  var csv = ["numero,apellido,nombre," + POSTAS.map(function(p){ return p.nombre.replace(/,/g,""); }).join(",")]
+    .concat(S.padron.map(function(p){
+      return [p.n, p.apellido, p.nombre].concat(POSTAS.map(function(po){
+        var m = marcaDe(po.id, p.n); return m && m.p ? "1" : "";
+      })).join(",");
+    })).join("\n");
+
+  return '<div class="cpo">' +
+    '<div class="h">Padrón ('+S.padron.length+' peregrinos)</div>' +
+    '<div class="caja">' +
+      '<p class="aviso">Copiá de la planilla las columnas número, apellido y nombre. ' +
+      'Si querés, sumá una cuarta con el micro y una quinta con el celular.</p>' +
+      '<textarea class="area" id="pegado" placeholder="1,ROMERO,JUAN,2,1100000001">'+esc(S.pegado)+'</textarea>' +
+      '<button class="btn" style="margin-top:10px" data-a="importar">Cargar padrón</button>' +
+      '<button class="btn sec" data-a="ejemplo">Probar con 15 nombres de ejemplo</button>' +
+    '</div>' +
+    '<div class="h">Para volver a la planilla</div>' +
+    '<textarea class="area" readonly>'+esc(csv)+'</textarea>' +
+    '<button class="btn sec" style="margin-top:14px" data-a="rol:peregrino">Usar este celular como peregrino</button>' +
+    '<button class="btn sec" data-a="rol:ninguno">Volver al inicio</button>' +
+    '</div>';
+}
+
+function vistaResponsable(){
+  var cuerpo = S.vista==="marcar" ? vistaMarcar()
+             : S.vista==="donde"  ? vistaDonde()
+             : vistaDatos();
+  var hayAvisos = S.avisos.some(function(a){ return !a.ok; });
+  var tabs = [["marcar","◉","Marcar"],["donde","⌖","Dónde están"],["datos","⚙","Datos"]]
+    .map(function(t){
+      return '<button class="tab'+(S.vista===t[0]?" act":"")+'" data-a="vista:'+t[0]+'">' +
+        (t[0]==="donde" && hayAvisos ? '<span class="dot"></span>' : '') +
+        '<i>'+t[1]+'</i>'+t[2]+'</button>';
+    }).join("");
+  return cuerpo + '<nav class="tabs">'+tabs+'</nav>';
+}
+
+function render(){
+  var html = S.pantalla==="inicio" ? vistaInicio()
+           : S.pantalla==="peregrino" ? vistaPeregrino()
+           : vistaResponsable();
+  app.innerHTML = html;
+}
+
+/* -------------------------------- eventos -------------------------------- */
+
+app.addEventListener("input", function(e){
+  var t = e.target;
+  if (t.id === "busq"){
+    S.busq = t.value;
+    var c = document.getElementById("lista");
+    if (c) c.innerHTML = htmlLista();
+  } else if (t.id === "pegado"){
+    S.pegado = t.value;
+  } else if (t.id === "quien"){
+    S.buscaNombre = t.value;
+    render();
+    var q = document.getElementById("quien");
+    if (q){ q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+  }
+});
+
+app.addEventListener("click", function(e){
+  var b = e.target.closest("[data-a]");
+  if (!b) return;
+  var a = b.getAttribute("data-a");
+  var i = a.indexOf(":");
+  var verbo = i<0 ? a : a.slice(0,i);
+  var arg = i<0 ? null : a.slice(i+1);
+
+  if (verbo === "rol"){
+    if (arg === "peregrino"){ S.pantalla = "peregrino"; }
+    else if (arg === "responsable"){ S.pantalla = "responsable"; S.vista = "marcar"; }
+    else { S.pantalla = "inicio"; }
+  }
+  else if (verbo === "soy"){
+    S.miNum = String(arg);
+    try { localStorage.setItem("postas-mi-numero", S.miNum); } catch(err){}
+    S.buscaNombre = "";
+  }
+  else if (verbo === "salir"){
+    S.miNum = ""; S.pantalla = "inicio"; S.ultima = null;
+    try { localStorage.removeItem("postas-mi-numero"); } catch(err){}
+  }
+  else if (verbo === "llegue"){
+    marcar(S.miNum, arg, "peregrino", true);
+    var po = POSTAS.filter(function(p){ return p.id===arg; })[0];
+    S.ultima = {id:arg, nombre:po?po.nombre:"", t:Date.now()};
+  }
+  else if (verbo === "deshacer"){
+    marcar(S.miNum, arg, "peregrino", false);
+    S.ultima = null;
+  }
+  else if (verbo === "pedir"){ S.pidiendo = arg; }
+  else if (verbo === "cancelar"){ S.pidiendo = null; }
+  else if (verbo === "confirmar"){ crearAviso(S.pidiendo); S.pidiendo = null; }
+  else if (verbo === "posta"){ S.postaSel = Number(arg); }
+  else if (verbo === "vista"){ S.vista = arg; }
+  else if (verbo === "filtro"){ S.filtro = arg; }
+  else if (verbo === "marcar"){ marcar(arg, POSTAS[S.postaSel].id, "resp"); }
+  else if (verbo === "resolver"){ resolverAviso(arg); }
+  else if (verbo === "ejemplo"){ guardarPadron(EJEMPLO); S.vista = "marcar"; }
+  else if (verbo === "importar"){
+    var lista = [];
+    S.pegado.split("\n").forEach(function(linea){
+      var c = linea.split(/\t|,|;/).map(function(x){ return x.trim().replace(/^"|"$/g,""); });
+      var n = parseInt(c[0],10);
+      if (!n || !c[1]) return;
+      lista.push({n:n, apellido:c[1], nombre:c[2]||"", micro:c[3]||"", tel:(c[4]||"").replace(/\D/g,"")});
+    });
+    if (!lista.length){ alert("No encontré filas con número y apellido."); return; }
+    guardarPadron(lista);
+    S.pegado = ""; S.vista = "marcar";
+  }
+  render();
+});
+
+render();
+})();
+</script>
+</body>
+</html>

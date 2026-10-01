@@ -1,0 +1,409 @@
+/* Las pantallas. La paleta y lo básico están en estilos.css. */
+
+/* viandas: las restricciones en amarillo, que se vean de lejos */
+.tipos { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.tipo {
+  flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  padding: 7px 11px; border-radius: 12px; background: var(--sup); border: 1px solid var(--borde); font-size: 12px;
+}
+.tipo b { font-size: 13px; }
+.tipo span { color: var(--tenue); }
+.tipo.rest { background: #fff4b8; color: #4a3500; border-color: #e2c41c; }
+.tipo.rest span { color: #6b5200; }
+.tipo.act { outline: 3px solid var(--celeste); }
+.fila .rest {
+  display: block; width: fit-content; margin-top: 3px; font-style: normal; font-size: 12px; font-weight: 800;
+  background: #fff4b8; color: #4a3500; padding: 2px 8px; border-radius: 999px;
+}
+.eco.ojo { background: #fff4b8; color: #4a3500; font-size: 20px; }
+.eco small { display: block; font-size: 14px; font-weight: 600; margin-top: 2px; }
+
+.tenue { color: var(--tenue); }
+.pt.mal { background: var(--alerta); }
+.pantalla { flex: 1; display: flex; flex-direction: column; }
+.pantalla > .cpo { flex: 1; }
+
+/* ------------------------------------------------------------------ */
+/* responsable                                                         */
+/* ------------------------------------------------------------------ */
+
+.cab {
+  position: sticky; top: 0; z-index: 5; background: var(--fondo);
+  padding: 14px 16px 12px; border-bottom: 1px solid var(--borde);
+}
+.postas-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.ptab {
+  flex: none; padding: 9px 13px; border-radius: 999px; background: var(--sup);
+  font-size: 13px; color: var(--tenue); white-space: nowrap; border: 1px solid var(--borde);
+}
+.ptab.act { background: var(--celeste); color: var(--fondo); font-weight: 650; border-color: transparent; }
+
+.cont { display: flex; align-items: baseline; gap: 8px; margin: 14px 0 8px; }
+.cont .n { font-size: 46px; font-weight: 700; line-height: 0.9; letter-spacing: -0.03em; }
+.cont .de { font-size: 15px; color: var(--tenue); }
+.cont .fa { margin-left: auto; font-size: 14px; color: var(--vela); font-weight: 600; }
+
+.ticks { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
+.tk { width: 6px; height: 13px; border-radius: 1px; background: var(--sup2); display: inline-block; }
+.tk.on { background: var(--celeste); }
+.tk.dijo { background: var(--ok); }
+
+.buscador { position: relative; }
+.buscador .busc { padding-right: 44px; }
+.borrar {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; font-size: 22px; color: var(--tenue); text-align: center;
+}
+.busc.grande { text-align: center; font-size: 19px; padding: 16px; }
+
+.chips { display: flex; gap: 8px; margin: 10px 0 14px; align-items: center; flex-wrap: wrap; }
+.chip {
+  padding: 8px 14px; border-radius: 999px; background: var(--sup); font-size: 13px;
+  color: var(--tenue); border: 1px solid var(--borde);
+}
+.chip.act { background: var(--celeste); color: var(--fondo); font-weight: 650; border-color: transparent; }
+.leyenda { margin-left: auto; font-size: 11px; color: var(--tenue); display: flex; align-items: center; gap: 4px; }
+.leyenda .tk { height: 10px; margin-left: 4px; }
+
+.fila {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 12px;
+  border-radius: 12px; background: var(--sup); margin-bottom: 7px;
+  border: 1px solid var(--borde); border-left: 3px solid transparent;
+  /* que el navegador no dibuje las filas que no se ven: scroll liviano en gama baja */
+  content-visibility: auto; contain-intrinsic-size: auto 58px;
+  touch-action: manipulation;
+}
+.fila.on { background: var(--celeste-suave); border-left-color: var(--celeste); }
+.fila.dijo { background: var(--ok-suave); border-left-color: var(--ok); }
+.num { flex: none; width: 36px; font-size: 13px; color: var(--tenue); font-weight: 600; }
+.nom { flex: 1; min-width: 0; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nom small {
+  display: block; font-size: 12px; color: var(--tenue); font-weight: 400; margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.mar {
+  flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--borde);
+  display: grid; place-items: center; font-size: 15px;
+}
+.fila.on .mar { background: var(--celeste); border-color: var(--celeste); color: var(--fondo); font-weight: 800; }
+.fila.dijo .mar { background: var(--ok); border-color: var(--ok); }
+
+.tabs {
+  position: sticky; bottom: 0; display: flex; background: var(--fondo); z-index: 5;
+  border-top: 1px solid var(--borde); padding: 6px 4px calc(10px + env(safe-area-inset-bottom));
+}
+.tab { flex: 1; padding: 8px 2px; font-size: 12px; color: var(--tenue); text-align: center; line-height: 1.5; position: relative; }
+.tab i { display: block; font-size: 18px; font-style: normal; }
+.tab.act { color: var(--celeste); font-weight: 650; }
+.dot {
+  position: absolute; top: 4px; right: calc(50% - 24px); width: 9px; height: 9px;
+  border-radius: 50%; background: var(--alerta);
+}
+
+.res { display: flex; align-items: center; gap: 11px; padding: 11px 0; border-bottom: 1px solid var(--borde); }
+.res:last-child { border-bottom: none; }
+.res .nm { flex: 1; font-size: 14px; }
+.res .ct { font-size: 14px; font-weight: 650; min-width: 52px; text-align: right; }
+.bar { width: 60px; height: 6px; border-radius: 3px; background: var(--sup2); overflow: hidden; flex: none; }
+.bar i { display: block; height: 100%; background: var(--celeste); }
+
+.grp { margin-bottom: 18px; }
+.grp h4 { margin: 0 0 8px; font-size: 14px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+.grp h4 em { font-style: normal; font-size: 12px; color: var(--tenue); font-weight: 500; }
+.grp.atras h4, .grp h4 em.ojo { color: var(--vela); }
+.gente { display: flex; flex-wrap: wrap; gap: 6px; }
+.per { background: var(--sup); border: 1px solid var(--borde); border-radius: 8px; padding: 7px 10px; font-size: 13px; }
+.grp.atras .per { background: var(--alerta-suave); border-color: transparent; }
+.per.abierto { outline: 2px solid var(--celeste); }
+.ficha {
+  display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding: 12px;
+  background: var(--sup); border: 1px solid var(--borde); border-radius: 12px; font-size: 14px;
+}
+.ficha .tenue { font-size: 13px; }
+
+.avi {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px; border-radius: 12px;
+  background: var(--alerta-suave); border-left: 3px solid var(--alerta); margin-bottom: 7px;
+}
+.avi .nom { white-space: normal; }
+.pill {
+  flex: none; font-size: 13px; color: var(--celeste); padding: 9px 12px; font-weight: 600;
+  border: 1px solid var(--borde); border-radius: 999px; text-decoration: none; background: var(--sup);
+}
+
+/* ------------------------------------------------------------------ */
+/* peregrino                                                           */
+/* ------------------------------------------------------------------ */
+
+.rotulo { font-size: 12px; letter-spacing: 0.09em; color: var(--tenue); font-weight: 650; margin-top: 22px; }
+.proxima { font-size: 30px; font-weight: 750; letter-spacing: -0.02em; margin: 3px 0 16px; }
+.gigante {
+  width: 100%; padding: 38px 18px; border-radius: 22px; background: var(--celeste);
+  color: var(--fondo); font-size: 23px; font-weight: 750; line-height: 1.25; text-align: center;
+  touch-action: manipulation; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+.gigante:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15); }
+.gigante.hecho {
+  background: var(--ok-suave); color: var(--ok); border: 1px solid var(--ok);
+  box-shadow: none; margin-top: 8px;
+}
+.link {
+  color: var(--celeste); font-size: 14px; text-decoration: underline;
+  display: inline-block; margin-top: 12px; padding: 6px;
+}
+.link.tenue { color: var(--tenue); font-size: 13px; }
+.ruta { margin-top: 26px; text-align: left; }
+.paso { display: flex; gap: 12px; align-items: center; padding: 9px 0; font-size: 15px; }
+.bol { width: 12px; height: 12px; border-radius: 50%; background: var(--sup2); flex: none; }
+.bol.on { background: var(--celeste); }
+.bol.dijo { background: var(--ok); }
+.paso.pend { color: var(--tenue); }
+.hora { font-size: 12px; color: var(--tenue); text-align: right; }
+.sug {
+  width: 100%; padding: 15px 14px; border-radius: 12px; background: var(--sup);
+  border: 1px solid var(--borde); margin-bottom: 7px; font-size: 17px; display: block;
+}
+.btn.peligro { background: var(--alerta); }
+.caja.alerta { background: var(--alerta-suave); border: none; font-size: 14px; text-align: left; line-height: 1.5; }
+
+.instalar { text-align: left; font-size: 14px; line-height: 1.5; border-color: var(--vela); }
+.instalar p { margin: 6px 0 10px; color: var(--tenue); font-size: 13px; }
+.instalar p.listo { color: var(--ok); font-weight: 600; margin-bottom: 0; }
+.instalar .btn { margin-top: 4px; }
+
+/* ------------------------------------------------------------------ */
+/* barra de la demo                                                    */
+/* ------------------------------------------------------------------ */
+
+.demo {
+  display: flex; gap: 4px; align-items: center; padding: 6px 8px; font-size: 12px;
+  background: var(--vela); color: var(--fondo); overflow-x: auto; position: relative; z-index: 6;
+}
+.demo b { padding: 0 6px 0 2px; letter-spacing: 0.08em; }
+.demo button {
+  flex: none; padding: 5px 9px; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.14); color: inherit; font-size: 12px;
+}
+.demo button.act { background: var(--fondo); color: var(--texto); font-weight: 700; }
+.demo button.act.mal { color: var(--alerta); }
+
+/* info del día, plegable */
+.caja.info summary { cursor: pointer; list-style: none; }
+.caja.info summary::after { content: ' ▾'; color: var(--tenue); }
+.caja.info[open] summary::after { content: ' ▴'; }
+.caja.info ul { margin: 10px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.5; }
+.caja.info li { margin-bottom: 6px; }
+
+/* presente por número de pechera */
+.pornum { display: flex; gap: 8px; margin-bottom: 8px; }
+.pornum .busc { flex: 1; min-width: 0; }
+.pornum .btn { width: auto; margin: 0; padding: 0 20px; }
+.eco { border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; font-weight: 700; font-size: 16px; }
+.eco.ok { background: var(--ok-suave); color: var(--ok); }
+.eco.mal { background: var(--alerta-suave); color: var(--alerta); }
+
+/* recién marcado, arriba de la parada siguiente */
+.caja.listo { background: var(--ok-suave); border: none; color: var(--ok); margin: 10px 0 16px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 17px; }
+.caja.listo .link { font-size: 14px; }
+.gigante[disabled] { opacity: 0.45; }
+
+/* pedidos de ayuda con ubicación: los botones bajan si no entran */
+.avi { flex-wrap: wrap; }
+.avi .nom { flex: 1 1 180px; }
+.pill.mapa { background: var(--celeste); color: var(--fondo); border-color: var(--celeste); }
+
+/* ------------------------------------------------------------------ */
+/* portada: Peregrinación N° 52                                        */
+/* ------------------------------------------------------------------ */
+
+.portada {
+  position: relative; overflow: hidden; color: #fff; text-align: center;
+  padding: 18px 16px 44px;
+  background:
+    linear-gradient(180deg, rgba(40, 120, 175, 0.25) 0%, rgba(22, 82, 138, 0.55) 45%, rgba(12, 52, 98, 0.94) 100%),
+    url('/camino.webp') center 40% / cover no-repeat,
+    #1f6ba6;
+}
+.portada-marco { position: relative; width: 168px; height: 250px; margin: 0 auto; }
+.portada-sol {
+  position: absolute; left: 50%; top: 42%; width: 360px; height: 360px; margin: -180px 0 0 -180px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(241, 226, 92, 0.55) 0deg 9deg, rgba(241, 226, 92, 0) 9deg 22.5deg);
+  -webkit-mask: radial-gradient(circle, #000 18%, transparent 68%);
+  mask: radial-gradient(circle, #000 18%, transparent 68%);
+  animation: girar 50s linear infinite;
+}
+.portada-virgen {
+  position: relative; display: block; height: 100%; width: auto; margin: 0 auto;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+  animation: flotar 5s ease-in-out infinite;
+}
+.portada-txt { position: relative; margin-top: 10px; }
+.portada-n {
+  display: inline-block; background: #f1e25c; color: #0b1830; font-weight: 800;
+  font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 13px; border-radius: 999px; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+  transform: rotate(-2deg);
+}
+.portada-frase {
+  font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-weight: 700;
+  font-size: 22px; line-height: 1.25; margin: 12px auto 6px; max-width: 330px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45); text-wrap: balance;
+}
+.portada-ruta { font-size: 13px; opacity: 0.92; letter-spacing: 0.02em; }
+.portada-ola { position: absolute; left: 0; bottom: -3px; width: 100%; height: 31px; fill: var(--fondo); }
+
+/* compacta: Virgen a la izquierda, lema a la derecha */
+.portada.compacta {
+  display: flex; align-items: center; gap: 12px; text-align: left; padding: 20px 16px 36px;
+  background-position: 0 0, center 78%, 0 0;
+}
+.portada.compacta .portada-marco { width: 64px; height: 108px; margin: 0; flex: none; }
+.portada.compacta .portada-sol { width: 190px; height: 190px; margin: -95px 0 0 -95px; }
+.portada.compacta .portada-txt { margin: 0; }
+.portada.compacta .portada-n { font-size: 11px; padding: 4px 10px; }
+.portada.compacta .portada-frase { font-size: 16px; margin: 7px 0 0; max-width: none; }
+
+@keyframes girar { to { transform: rotate(360deg); } }
+@keyframes flotar { 50% { transform: translateY(-6px); } }
+
+/* ------------------------------------------------------------------ */
+/* peregrino, con más vida                                             */
+/* ------------------------------------------------------------------ */
+
+.gigante:not(.hecho) {
+  position: relative; overflow: hidden;
+  background: linear-gradient(140deg, #2d8fd0 0%, #1f6ba6 55%, #16558b 100%);
+  color: #fff; box-shadow: 0 5px 0 #0f3f68, 0 10px 24px rgba(31, 107, 166, 0.35);
+}
+.gigante:not(.hecho):active { box-shadow: 0 2px 0 #0f3f68; }
+.gigante:not(.hecho)::after {
+  content: ''; position: absolute; inset: 0 auto 0 -60%; width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: skewX(-18deg); animation: brillo 3.2s ease-in-out infinite;
+}
+.gigante[disabled]::after { animation: none; }
+@keyframes brillo { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+
+.rotulo { color: var(--celeste); }
+
+/* la ruta como un camino: puntitos unidos por una línea de pasos */
+.ruta { position: relative; padding-left: 4px; }
+.ruta::before {
+  content: ''; position: absolute; left: 11px; top: 18px; bottom: 18px;
+  border-left: 3px dotted var(--sup2);
+}
+.ruta .bol { position: relative; width: 17px; height: 17px; border: 3px solid var(--fondo); box-shadow: 0 0 0 2px var(--sup2); }
+.ruta .bol.on, .ruta .bol.dijo { box-shadow: 0 0 0 2px #f1e25c; }
+
+.caja.listo { animation: aparecer 0.35s ease-out; }
+@keyframes aparecer { from { transform: scale(0.92); opacity: 0; } }
+
+/* papelitos al marcar */
+.festejo { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20; }
+.festejo i {
+  position: absolute; top: -12px; width: 9px; height: 14px; border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  animation: caer 1.6s cubic-bezier(0.25, 0.6, 0.5, 1) forwards;
+}
+@keyframes caer {
+  to { transform: translate(var(--x), 105vh) rotate(var(--giro)); opacity: 0.2; }
+}
+
+/* responsable: una franja con los colores de Luján arriba */
+.cab { background: linear-gradient(90deg, #8cc3e0, #f1e25c 50%, #8cc3e0) top / 100% 5px no-repeat, var(--fondo); padding-top: 19px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .portada-sol, .portada-virgen, .gigante::after, .caja.listo { animation: none !important; }
+  .festejo { display: none; }
+}
+
+/* va en el micro */
+.caja.micro {
+  background: linear-gradient(135deg, #fdf7c9, #e3f1fa); border: none; color: #0b1830;
+  text-align: left; display: flex; flex-direction: column; gap: 6px; margin: 12px 0 4px;
+  font-size: 14px; line-height: 1.45; animation: aparecer 0.35s ease-out;
+}
+.caja.micro b { font-size: 16px; }
+.caja.micro .btn { margin-top: 6px; }
+
+/* presentismo: los que declararon y falta confirmar */
+.dijeron { font-size: 13px; color: var(--ok); font-weight: 600; min-height: 4px; margin: -2px 0 6px; }
+
+/* escáner de QR */
+.btn.escanear { margin-bottom: 10px; font-size: 17px; padding: 17px; background: linear-gradient(140deg, #2d8fd0, #1f6ba6); color: #fff; }
+.escaner {
+  position: fixed; inset: 0; z-index: 30; background: #000; color: #fff;
+  display: flex; flex-direction: column;
+}
+.esc-cab { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #0b1830; flex-wrap: wrap; }
+.esc-cab b { font-size: 16px; }
+.esc-cab span { font-size: 13px; opacity: 0.8; flex: 1; min-width: 120px; }
+.esc-bot { background: rgba(255, 255, 255, 0.16); color: #fff; border-radius: 999px; padding: 9px 14px; font-weight: 700; font-size: 14px; }
+.esc-video { position: relative; flex: 1; overflow: hidden; }
+.esc-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.esc-mira {
+  position: absolute; left: 50%; top: 50%; width: 62vmin; height: 62vmin; transform: translate(-50%, -50%);
+  border: 3px solid rgba(241, 226, 92, 0.9); border-radius: 18px; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+}
+.esc-res {
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); font-size: 15px; background: #132648;
+  display: flex; flex-direction: column; gap: 3px; min-height: 92px; justify-content: center;
+  animation: aparecer 0.2s ease-out;
+}
+.esc-res b { font-size: 20px; }
+.esc-res.ok { background: #17703f; }
+.esc-res.ya { background: #1f6ba6; }
+.esc-res.ojo { background: #a36a05; }
+.esc-res.mal { background: #b33e27; }
+
+
+/* tarjetas con QR para imprimir */
+.tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 16px; }
+.tarjeta {
+  background: #fff; color: #0b1830; border: 2px solid #1f6ba6; border-radius: 12px;
+  padding: 10px 8px 8px; text-align: center; break-inside: avoid;
+}
+.tarjeta.eq { border-color: #e2c41c; }
+.t-qr svg { width: 100%; height: auto; display: block; }
+.t-num { font-size: 30px; font-weight: 800; line-height: 1; margin-top: 4px; letter-spacing: -0.02em; }
+.tarjeta.eq .t-num { font-size: 20px; letter-spacing: 0.08em; }
+.t-nom { font-size: 13px; font-weight: 700; margin-top: 4px; line-height: 1.2; }
+.t-pie { font-size: 9.5px; color: #5b7196; margin-top: 3px; }
+
+@media print {
+  @page { size: A4; margin: 10mm; }
+  body { background: #fff !important; }
+  .no-imprimir, .tabs, .demo, .cab { display: none !important; }
+  .qrs { padding: 0 !important; }
+  .tarjetas { grid-template-columns: repeat(4, 1fr); gap: 5mm; margin: 0; }
+  .tarjeta { padding: 3mm; }
+}
+
+/* equipo: su lema */
+.lema-equipo {
+  font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 13px;
+  color: var(--celeste); margin: 0 0 8px; display: flex; gap: 6px; align-items: baseline;
+}
+.lema-equipo b { font-family: ui-sans-serif, system-ui, sans-serif; font-style: normal; font-size: 11px; letter-spacing: 0.08em; background: #f1e25c; color: #0b1830; padding: 2px 7px; border-radius: 999px; }
+
+/* el QR del peregrino, arriba de todo */
+.mi-qr {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  background: var(--sup); border: 2px solid #8cc3e0; border-radius: 18px; padding: 10px 14px 10px 10px;
+  box-shadow: 0 6px 18px rgba(31, 107, 166, 0.12);
+}
+.mi-qr-img { flex: none; width: 118px; height: 118px; background: #fff; border-radius: 10px; padding: 4px; }
+.mi-qr-img svg, .qr-grande svg { width: 100%; height: 100%; display: block; }
+.mi-qr-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mi-qr-txt b { font-size: 26px; letter-spacing: -0.02em; line-height: 1.05; }
+.mi-qr-txt span { font-size: 15px; font-weight: 600; }
+.mi-qr-txt small { font-size: 12px; color: var(--tenue); line-height: 1.35; margin-top: 3px; }
+.qr-grande {
+  position: fixed; inset: 0; z-index: 40; background: #fff; color: #0b1830;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 24px;
+}
+.qr-grande div { width: min(86vw, 62vh); aspect-ratio: 1; }
+.qr-grande b { font-size: 44px; margin-top: 10px; }
+.qr-grande span { font-size: 18px; font-weight: 600; }
+.qr-grande small { font-size: 13px; color: #5b7196; margin-top: 8px; }
