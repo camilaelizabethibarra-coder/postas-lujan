@@ -596,3 +596,6 @@
 .dietas b { width: 100%; font-size: 22px; letter-spacing: -0.01em; }
 .dietas span { background: #fff; border: 1px solid #e9d97a; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
 .dietas em { font-style: normal; font-size: 15px; color: #a37d00; margin-right: 2px; }
+
+.cambiar-salida { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tenue); }
+.cambiar-salida select { flex: 1; font: inherit; font-size: 16px; color: var(--texto); background: var(--fondo); border: 1px solid var(--borde); border-radius: 10px; padding: 9px 10px; }

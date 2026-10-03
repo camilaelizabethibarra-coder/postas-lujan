@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'preact/hooks'
-import { useDatos, marcar, darDeBaja } from '../lib/datos'
+import { useDatos, marcar, darDeBaja, elegirSalida } from '../lib/datos'
 import { normalizar } from '../lib/padron'
 import {
   POSTA_PECHERA, POSTA_DEVUELTA, SALIDAS, comidaDe, postaDeSalida, retiroDe,
@@ -247,6 +247,22 @@ function Tarjeta({
           {p.nota && <span>{p.nota}</span>}
         </div>
       </div>
+
+      {p.tramo !== 'solo_vuelta' && (
+        <label class="cambiar-salida">
+          Sale desde
+          <select
+            value={p.salida_ok || p.tramo !== 'completo' ? p.tramo : ''}
+            onChange={(ev) => {
+              const t = (ev.currentTarget as HTMLSelectElement).value
+              if (t) elegirSalida(p.numero, t as Persona['tramo'])
+            }}
+          >
+            {!(p.salida_ok || p.tramo !== 'completo') && <option value="">— elegir —</option>}
+            {SALIDAS.map((x) => <option key={x.tramo} value={x.tramo}>{x.nombre}</option>)}
+          </select>
+        </label>
+      )}
 
       {modo === 'entrega' ? (
         p.tramo === 'solo_vuelta' ? (
