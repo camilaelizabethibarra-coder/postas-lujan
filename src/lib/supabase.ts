@@ -169,3 +169,11 @@ export async function importarPadron(token: string, filas: unknown[]): Promise<n
   if (error) throw new Error(error.message)
   return (data as number) ?? 0
 }
+
+/** Sumar a alguien el mismo día (solo coordinador). No desactiva a nadie. */
+export async function agregarPersona(token: string, fila: unknown): Promise<number> {
+  const db = await supa()
+  const { data, error } = await db.rpc('agregar_persona', { p_token: token, p_fila: fila })
+  if (error) throw new Error(error.message)
+  return data as number
+}

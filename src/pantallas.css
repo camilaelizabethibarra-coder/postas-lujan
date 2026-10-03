@@ -559,3 +559,10 @@
 .esp-quien b { font-size: 15px; }
 .esp-quien span { font-size: 12px; color: #5b7196; }
 .vesp.dada .mar { background: #17703f; border-color: #17703f; color: #fff; }
+
+/* formularios del coordinador */
+.sumar label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--tenue); font-weight: 600; margin-bottom: 10px; }
+.sumar input, .sumar select {
+  font: inherit; font-size: 16px; color: var(--texto); background: var(--fondo);
+  border: 1px solid var(--borde); border-radius: 10px; padding: 11px 12px;
+}

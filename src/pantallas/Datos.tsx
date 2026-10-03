@@ -9,6 +9,7 @@ import { leerExcel } from '../lib/excel'
 import type { Fila } from '../lib/padron'
 import { Importar } from './Importar'
 import { Instalar } from './comunes'
+import { Sumar, ConectarSheets } from './Sumar'
 
 /** La planilla de vuelta lleva también la vianda y la pechera (entregada y devuelta). */
 const POSTAS_EXPORTAR = [...POSTAS_POR_DEFECTO, POSTA_VIANDA, POSTA_PECHERA, POSTA_DEVUELTA]
@@ -151,6 +152,12 @@ export function Datos({
         {!esDemo() && ' Cargar necesita señal.'}
       </p>
       {mensaje && <div class="eco ok">{mensaje}</div>}
+
+      <div class="h">Sumar a alguien hoy</div>
+      <Sumar />
+
+      <div class="h">Conectar con Google Sheets</div>
+      <ConectarSheets />
 
       <div class="h">2. QR de las pecheras</div>
       <div class="caja">

@@ -15,6 +15,7 @@ import { Datos } from './Datos'
 import { Viandas } from './Viandas'
 import { Pecheras } from './Pecheras'
 import { QRs } from './QRs'
+import { sincronizarSheetsSolo } from '../lib/sheets'
 
 type Vista = 'pecheras' | 'marcar' | 'viandas' | 'ayudas' | 'donde' | 'datos' | 'qr'
 
@@ -63,7 +64,11 @@ function Tablero({ rol, alSalir }: { rol: Rol; alSalir: () => void }) {
     guardarPosta(POSTAS[i]!.id)
   }
 
-  useEffect(() => { arrancar({ rol: 'resp' }) }, [])
+  useEffect(() => {
+    arrancar({ rol: 'resp' })
+    // el celular del coordinador trae la planilla de Sheets sola, si está conectada
+    if (coord && !esDemo()) sincronizarSheetsSolo()
+  }, [])
   useEffect(() => { scrollTo(0, 0) }, [vista])
 
   const enLaReja = POSTAS[postaSel]?.id === POSTA_VIANDAS
