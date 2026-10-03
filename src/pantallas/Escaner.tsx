@@ -53,7 +53,7 @@ export function Escaner({
         const n = texto ? leerCodigo(texto) : null
         const ahora = Date.now()
         if (texto && n == null) {
-          setUltima({ tono: 'mal', texto: 'Ese QR no es de una pechera' })
+          setUltima({ tono: 'mal', texto: 'Ese QR no es de la app de la peregrinación' })
         } else if (n != null && ahora - (recientes.get(n) ?? 0) > 3000) {
           recientes.set(n, ahora)
           const r = leer.current(n)
@@ -84,7 +84,7 @@ export function Escaner({
     <div class="escaner" role="dialog" aria-label={titulo}>
       <div class="esc-cab">
         <b>{titulo}</b>
-        <span>{cuenta ? `${cuenta} en esta tanda` : 'Apuntá al QR de la pechera'}</span>
+        <span>{cuenta ? `${cuenta} en esta tanda` : 'Apuntá al QR en el celular del peregrino'}</span>
         {linterna != null && (
           <button class="esc-bot" onClick={alternarLinterna} aria-pressed={linterna}>
             {linterna ? '🔦 Apagar' : '🔦 Luz'}

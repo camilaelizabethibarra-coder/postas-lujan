@@ -152,11 +152,11 @@ export function Marcar({
         )}
 
         <p class="paso-a-paso">
-          Para dar el presente: <b>escaneá el QR</b> de la pechera (o del celular), o escribí el número.
+          Para dar el presente: <b>escaneá el QR</b> en el celular del peregrino, o escribí su número de pechera.
           Lo que el peregrino marca solo con "Llegué" queda en verde hasta que lo confirmes.
           {posta.id === 'po5' && <b> En la subida al micro, pedile también la pechera.</b>}
         </p>
-        <button class="btn escanear" onClick={() => setEscaneando(true)}>📷 Escanear QR de las pecheras</button>
+        <button class="btn escanear" onClick={() => setEscaneando(true)}>📷 Escanear QR del celular</button>
         {escaneando && (
           <Escaner titulo={`Presente en ${posta.nombre}`} alLeer={darPresente} alCerrar={() => setEscaneando(false)} />
         )}

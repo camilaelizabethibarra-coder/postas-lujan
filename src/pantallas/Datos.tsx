@@ -159,11 +159,11 @@ export function Datos({
       <div class="h">Conectar con Google Sheets</div>
       <ConectarSheets />
 
-      <div class="h">2. QR de las pecheras</div>
+      <div class="h">2. QR para imprimir (opcional)</div>
       <div class="caja">
         <p class="aviso">
-          Una tarjeta por persona con su QR, para imprimir y pegar en la pechera. Cada peregrino
-          también ve su QR en la app.
+          Cada peregrino tiene su QR en la app. Si alguna vez hace falta tenerlo en papel (alguien
+          sin celular), acá se imprime.
         </p>
         <button class="btn" onClick={alVerQR} disabled={!e.padron.length}>Ver e imprimir los QR</button>
       </div>

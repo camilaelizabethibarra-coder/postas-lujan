@@ -134,7 +134,7 @@ export function Pecheras() {
         ) : (
           <>
             <p class="paso-a-paso">
-              Al subir al micro: escaneá el QR de la pechera o escribí el número. Queda anotado que la devolvió.
+              Al subir al micro: escaneá el QR de su celular o escribí el número de la pechera. Queda anotado que la devolvió.
             </p>
             <button class="btn escanear" onClick={() => setEscaneando(true)}>📷 Escanear pecheras que devuelven</button>
             {escaneando && <Escaner titulo="Devolución de pecheras" alLeer={devolver} alCerrar={() => setEscaneando(false)} />}

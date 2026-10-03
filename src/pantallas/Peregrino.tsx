@@ -294,7 +294,7 @@ function MiQR({ yo }: { yo: Persona }) {
         <span class="mi-qr-txt">
           <b>{yo.es_equipo ? 'Equipo' : `Nº ${yo.numero}`}</b>
           {nombre && <span>{nombre}</span>}
-          <small>Mostrale este QR al equipo en cada parada, o el de tu pechera. Tocá para agrandar.</small>
+          <small>Mostrale este QR al equipo en cada parada. Tocá para agrandarlo.</small>
         </span>
       </button>
       {grande && (
