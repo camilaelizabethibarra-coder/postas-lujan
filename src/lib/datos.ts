@@ -353,6 +353,27 @@ export async function podarAntesDe(iso: string): Promise<number> {
   return n
 }
 
+/**
+ * Los avisos que este celular tiene guardados pero que la base ya no tiene
+ * (pruebas borradas), y que tampoco están esperando para subir: se borran.
+ * peregrino: si se bajaron solo los de una persona, solo se revisan los suyos.
+ */
+export async function quitarAvisosQueNoEstan(enServidor: Aviso[], peregrino?: number): Promise<void> {
+  const hay = new Set(enServidor.map((a) => a.id))
+  const enCola = new Set(
+    (await leerCola()).flatMap((p) => (p.tipo === 'aviso' ? [p.aviso.id] : [])),
+  )
+  const fuera = estado.avisos.filter(
+    (a) => (peregrino == null || a.peregrino === peregrino) && !hay.has(a.id) && !enCola.has(a.id),
+  )
+  if (!fuera.length) return
+  const ids = new Set(fuera.map((a) => a.id))
+  estado.avisos = estado.avisos.filter((a) => !ids.has(a.id))
+  avisar()
+  const tx = (await base()).transaction('avisos', 'readwrite')
+  await Promise.all([...fuera.map((a) => tx.store.delete(a.id)), tx.done])
+}
+
 /** Para la demo: empezar de cero. */
 export async function borrarTodo(): Promise<void> {
   const d = await base()

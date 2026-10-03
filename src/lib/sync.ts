@@ -8,6 +8,7 @@
  */
 import {
   estado, avisar, leerCola, sacarDeCola, aplicarRemotas, aplicarAvisos, aplicarUbicaciones, podarAntesDe,
+  quitarAvisosQueNoEstan,
   reemplazarPadron, cuandoSeEncole, meta, guardarMeta,
 } from './datos'
 import { remoto, ErrorSesion, ErrorHuerfano } from './remoto'
@@ -120,14 +121,19 @@ async function bajar(): Promise<void> {
       desde ?? null,
     )
     if (ultimo) await guardarMeta('cursor', ultimo)
-    await aplicarAvisos(await remoto.bajarAvisos())
+    const avisos = await remoto.bajarAvisos()
+    await aplicarAvisos(avisos)
+    // pedidos de ayuda de prueba que quedaron guardados en este celular
+    if (!esDemo()) await quitarAvisosQueNoEstan(avisos)
     // que un problema con las ubicaciones nunca deje al equipo sin marcas ni avisos
     try { await aplicarUbicaciones(await remoto.bajarUbicaciones(token)) }
     catch (e) { console.warn('ubicaciones:', e) }
   } else if (modo.numero != null) {
     // el peregrino solo necesita lo suyo
     await aplicarRemotas(await remoto.bajarMarcas(null, modo.numero))
-    await aplicarAvisos(await remoto.bajarAvisos(modo.numero))
+    const suyos = await remoto.bajarAvisos(modo.numero)
+    await aplicarAvisos(suyos)
+    if (!esDemo()) await quitarAvisosQueNoEstan(suyos, modo.numero)
   }
 }
 
