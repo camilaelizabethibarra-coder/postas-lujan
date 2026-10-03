@@ -3,7 +3,7 @@ import { useDatos, marcar, pedirAuxilio, elegirSalida } from '../lib/datos'
 import { arrancar } from '../lib/sync'
 import { esDemo } from '../lib/demo'
 import { normalizar } from '../lib/padron'
-import { POSTAS_POR_DEFECTO as POSTAS, SALIDAS, textoLlegue, textoListo, seEsperaEn } from '../lib/postas'
+import { POSTAS_POR_DEFECTO as POSTAS, SALIDAS, COORDINADORES, textoLlegue, textoListo, seEsperaEn } from '../lib/postas'
 import { proximaPosta, enMicro, esPedido, type Persona, type Ubicacion } from '../lib/regla'
 import { hora } from '../lib/exportar'
 import { Estado, Instalar, Portada, Festejo } from './comunes'
@@ -127,8 +127,17 @@ function Identificarse({ padron, alElegir }: { padron: Persona[]; alElegir: (n: 
       <Portada />
       <div class="centro" style="padding-top: 10px">
         <div class="g">¿Quién sos?</div>
-        <div class="s" style="margin-bottom: 18px">
+        <div class="s" style="margin-bottom: 14px">
           {porApellido ? 'Escribí tu apellido y tocá tu nombre' : 'Escribí tu número de pechera y tocá tu nombre'}
+        </div>
+
+        <div class="cartel-pechera">
+          <b>Tu número de pechera te acompaña toda la peregrinación</b>
+          <span>
+            Con ese número entrás a la app y el equipo te da el presente en cada parada.
+            Retirá tu pechera con el equipo <b>antes de empezar a caminar</b>: en la parroquia o en
+            la primera parada donde te encuentres con nosotros.
+          </span>
         </div>
 
         {padron.length === 0 ? (
@@ -235,6 +244,7 @@ function InfoDelDia({ tramo, alCambiar }: { tramo: string; alCambiar: () => void
           <li>Si falta algún conocido que se anotó y no está en el grupo, que se agregue.</li>
           <li>Dudas: <b>Cami Ibarra, Uri Tripo o Cami Acosta</b>.</li>
         </ul>
+        <Llamar />
       </details>
     </>
   )
@@ -295,6 +305,21 @@ function MiQR({ yo }: { yo: Persona }) {
         </div>
       )}
     </>
+  )
+}
+
+/** Llamar o escribir a una coordinadora: que pueda elegir a quién en el momento. */
+function Llamar() {
+  return (
+    <div class="llamar">
+      <span class="llamar-tit">Si podés, llamá directamente a una coordinadora:</span>
+      {COORDINADORES.map((c) => (
+        <div key={c.tel} class="llamar-fila">
+          <a class="btn llamar-tel" href={`tel:+549${c.tel}`}>📞 {c.nombre}</a>
+          <a class="llamar-wa" href={`https://wa.me/549${c.tel}`} target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -404,6 +429,7 @@ function Principal({ yo, alSalir, alCambiarSalida }: { yo: Persona; alSalir: () 
             Ya le avisaste al equipo a las {hora(miAviso.creado_en)}
             {miAviso.lat != null ? ', con tu ubicación' : ' (sin ubicación: no se pudo leer el GPS)'}.
             Quedate donde estás, con el celular a mano.
+            <Llamar />
           </div>
         )}
 
@@ -465,6 +491,7 @@ function Principal({ yo, alSalir, alCambiarSalida }: { yo: Persona; alSalir: () 
             >
               {buscando ? 'Buscando tu ubicación…' : 'Sí, avisar al equipo'}
             </button>
+            <Llamar />
             <button class="btn sec" onClick={() => setPidiendo(null)}>Mejor no</button>
           </div>
         ) : (

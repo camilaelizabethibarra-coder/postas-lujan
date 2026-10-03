@@ -59,6 +59,15 @@ export function primeraPosta(tramo: string): number {
   }
 }
 
+/**
+ * A quién llamar si hace falta ayuda. Una llamada usa la red de voz, que a
+ * veces anda cuando los datos no; el WhatsApp necesita datos.
+ */
+export const COORDINADORES: { nombre: string; tel: string }[] = [
+  { nombre: 'Cami Ibarra', tel: '1128638028' },
+  { nombre: 'Cami Acosta', tel: '1166849716' },
+]
+
 /** Lo que ve el peregrino al elegir desde dónde sale, y la hora de encuentro en la parroquia. */
 export const SALIDAS: { tramo: string; nombre: string; cita: string }[] = [
   { tramo: 'completo', nombre: 'Morón', cita: 'A las 7:00 en la parroquia' },

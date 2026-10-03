@@ -407,3 +407,22 @@
 .qr-grande b { font-size: 44px; margin-top: 10px; }
 .qr-grande span { font-size: 18px; font-weight: 600; }
 .qr-grande small { font-size: 13px; color: #5b7196; margin-top: 8px; }
+
+/* cartel de la pechera, en la entrada */
+.cartel-pechera {
+  text-align: left; display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px;
+  background: #fff4b8; color: #4a3500; border: 2px solid #e2c41c; border-radius: 16px;
+  padding: 13px 15px; font-size: 14px; line-height: 1.45;
+}
+.cartel-pechera > b { font-size: 16px; color: #0b1830; }
+.cartel-pechera > b::before { content: '🎽 '; }
+
+/* llamar a una coordinadora */
+.llamar { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 10px; text-align: left; }
+.llamar-tit { font-size: 13px; color: var(--tenue); font-weight: 600; }
+.llamar-fila { display: flex; gap: 8px; align-items: stretch; }
+.btn.llamar-tel { flex: 1; margin: 0; background: #17703f; color: #fff; text-decoration: none; font-size: 16px; }
+.llamar-wa {
+  flex: none; display: flex; align-items: center; padding: 0 14px; border-radius: 12px;
+  background: var(--sup2); color: var(--texto); font-weight: 700; font-size: 13px; text-decoration: none;
+}
