@@ -147,8 +147,9 @@ export function Datos({
         />
       </div>
       <p class="aviso" style="margin-top: 10px">
-        Padrón actual: {e.padron.filter((p) => p.activo && !p.es_equipo).length} peregrinos y{' '}
-        {e.padron.filter((p) => p.activo && p.es_equipo).length} del equipo.
+        Padrón actual: <b>{e.padron.filter((p) => p.activo && !p.es_equipo && p.tramo !== 'solo_vuelta').length} peregrinos con pechera</b>
+        {' + '}{e.padron.filter((p) => p.activo && p.tramo === 'solo_vuelta').length} que solo vuelven
+        {' + '}{e.padron.filter((p) => p.activo && p.es_equipo).length} del equipo.
         {!esDemo() && ' Cargar necesita señal.'}
       </p>
       {mensaje && <div class="eco ok">{mensaje}</div>}
