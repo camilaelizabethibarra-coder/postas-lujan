@@ -15,7 +15,8 @@
 alter table peregrinos add column if not exists comida    text;
 alter table peregrinos add column if not exists salida_ok boolean not null default false;
 
-create or replace view padron as
+drop view if exists padron;
+create view padron as
   select numero, apellido, nombre, micro, tramo, es_equipo, nota, activo, salida_ok
   from peregrinos;
 grant select on padron to anon, authenticated;

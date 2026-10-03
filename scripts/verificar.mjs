@@ -81,7 +81,8 @@ if (postas.estado === 404 || postas.cuerpo?.code === 'PGRST205') {
   return
 }
 
-prueba('las cinco postas están', postas.estado === 200 && postas.cuerpo?.length === 5,
+// las del recorrido; viandas y pecheras (orden 90+) no son lugares
+prueba('las cinco postas están', postas.estado === 200 && postas.cuerpo?.filter((p) => p.orden < 90).length === 5,
   JSON.stringify(postas.cuerpo))
 
 prueba('la vista de postas no expone el PIN',

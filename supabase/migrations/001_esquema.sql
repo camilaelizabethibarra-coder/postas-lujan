@@ -135,7 +135,10 @@ grant select on marcas, avisos to anon, authenticated;
 create or replace view postas_publicas as
   select id, orden, nombre from postas;
 
-create or replace view padron as
+-- drop + create (y no "or replace"): así se puede volver a correr aunque una
+-- migración posterior le haya agregado columnas a la vista
+drop view if exists padron;
+create view padron as
   select numero, apellido, nombre, micro, tramo, es_equipo, nota, activo
   from peregrinos;
 

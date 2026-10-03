@@ -1,6 +1,6 @@
 -- =====================================================================
--- TODAS LAS MIGRACIONES JUNTAS (001 a 008), para una base nueva.
--- Pegar entero en el SQL Editor de Supabase y correr una sola vez.
+-- TODAS LAS MIGRACIONES JUNTAS (001 a 008).
+-- Para una base nueva. Se puede volver a correr sobre una que ya las tiene.
 -- Al final muestra los dos PIN: coordinador y servicio. Anotalos.
 -- =====================================================================
 
@@ -143,7 +143,10 @@ grant select on marcas, avisos to anon, authenticated;
 create or replace view postas_publicas as
   select id, orden, nombre from postas;
 
-create or replace view padron as
+-- drop + create (y no "or replace"): así se puede volver a correr aunque una
+-- migración posterior le haya agregado columnas a la vista
+drop view if exists padron;
+create view padron as
   select numero, apellido, nombre, micro, tramo, es_equipo, nota, activo
   from peregrinos;
 
@@ -569,7 +572,8 @@ alter table avisos add constraint avisos_tipo_check
 alter table peregrinos add column if not exists comida    text;
 alter table peregrinos add column if not exists salida_ok boolean not null default false;
 
-create or replace view padron as
+drop view if exists padron;
+create view padron as
   select numero, apellido, nombre, micro, tramo, es_equipo, nota, activo, salida_ok
   from peregrinos;
 grant select on padron to anon, authenticated;
