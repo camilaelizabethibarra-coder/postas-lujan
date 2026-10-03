@@ -201,6 +201,13 @@ export async function elegirSalida(numero: number, tramo: Persona['tramo']): Pro
   alEncolar()
 }
 
+/** El coordinador da de baja a alguien (se fue, no sigue): queda como "no sigue", sin pedido abierto. */
+export async function darDeBaja(numero: number): Promise<void> {
+  await pedirAuxilio(numero, 'bajo')
+  const a = estado.avisos.find((x) => x.peregrino === numero && x.tipo === 'bajo' && !x.resuelto)
+  if (a) await resolverAviso(a.id)
+}
+
 export async function resolverAviso(id: string): Promise<void> {
   const a = estado.avisos.find((x) => x.id === id)
   if (!a || a.resuelto) return

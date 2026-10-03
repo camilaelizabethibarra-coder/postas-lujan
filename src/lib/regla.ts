@@ -64,6 +64,29 @@ export const clave = (posta: string, peregrino: number) => `${posta}|${peregrino
 /** Los que piden que el equipo haga algo. "Dejé de caminar" no es uno de esos. */
 export const esPedido = (a: Aviso) => a.tipo === 'bajo' || a.tipo === 'ayuda'
 
+/**
+ * Quiénes participan de verdad: los que tienen pechera (la retiraron antes o
+ * se la dimos hoy) o ya aparecieron en alguna parada. Los que solo vuelven,
+ * también. Quien no vino nunca recibe pechera: no cuenta como faltante.
+ */
+export function participan(padron: Persona[], marcas: Marcas): Set<number> {
+  const s = new Set<number>()
+  const postas = ['pechera', 'po1', 'po2', 'po3', 'po4', 'po5']
+  for (const p of padron) {
+    if (!p.activo || p.es_equipo) continue
+    if (p.tramo === 'solo_vuelta' || p.pechera_ok || postas.some((id) => marcaDe(marcas, id, p.numero))) s.add(p.numero)
+  }
+  return s
+}
+
+/** Los que se bajaron: tocaron "No puedo seguir" o el coordinador los dio de baja. */
+export function seBajaron(avisos: Aviso[]): Set<number> {
+  return new Set(avisos.filter((a) => a.tipo === 'bajo').map((a) => a.peregrino))
+}
+
+/** Lo que filtra a quién se espera: participa, y no se bajó. */
+export type Filtro = { participan?: Set<number>; bajas?: Set<number> }
+
 /** Mientras va en el micro, la próxima parada donde se lo espera es Luján (orden 4). */
 export const ORDEN_LUJAN = 4
 
@@ -128,14 +151,17 @@ export function proximaPosta(marcas: Marcas, postas: PostaFila[], persona: Perso
 
 /** A quién se espera en una posta: activos, con el tramo que la incluye, o que igual marcaron. */
 export function esperadosEn(
-  padron: Persona[], marcas: Marcas, posta: PostaFila, micro: Set<number> = new Set(),
+  padron: Persona[], marcas: Marcas, posta: PostaFila, micro: Set<number> = new Set(), f: Filtro = {},
 ): Persona[] {
   // el equipo no es peregrino: no se le toma lista
   return padron.filter(
     (p) =>
       p.activo && !p.es_equipo &&
-      ((seEsperaEn(p.tramo, posta.orden) && !(micro.has(p.numero) && posta.orden < ORDEN_LUJAN)) ||
-        marcaDe(marcas, posta.id, p.numero)),
+      (marcaDe(marcas, posta.id, p.numero) ||
+        (seEsperaEn(p.tramo, posta.orden) &&
+          !(micro.has(p.numero) && posta.orden < ORDEN_LUJAN) &&
+          (!f.participan || f.participan.has(p.numero)) &&
+          !(f.bajas && f.bajas.has(p.numero)))),
   )
 }
 
@@ -146,7 +172,13 @@ export type Grupo = { indice: number; gente: Persona[]; atras: boolean }
  * atrás. Quedó atrás quien está dos postas o más detrás del que va primero.
  * Quien solo vuelve de Luján y todavía no apareció no es una alarma: va aparte.
  */
-export function dondeEstan(padron: Persona[], marcas: Marcas, postas: PostaFila[], micro: Set<number> = new Set()) {
+export function dondeEstan(
+  padron: Persona[], marcas: Marcas, postas: PostaFila[], micro: Set<number> = new Set(), f: Filtro = {},
+) {
+  // los que no recibieron pechera (no vinieron) y los que se bajaron, aparte
+  const noVinieron = padron.filter((p) => p.activo && !p.es_equipo && f.participan && !f.participan.has(p.numero))
+  const bajas = padron.filter((p) => p.activo && !p.es_equipo && f.bajas?.has(p.numero))
+  padron = padron.filter((p) => !noVinieron.includes(p) && !bajas.includes(p))
   const indiceLujan = postas.findIndex((p) => p.orden >= ORDEN_LUJAN)
   // los que van en el micro y todavía no llegaron a Luján van aparte: no son alarma
   const vanEnMicro = padron.filter(
@@ -172,5 +204,5 @@ export function dondeEstan(padron: Persona[], marcas: Marcas, postas: PostaFila[
     if (gente.length) grupos.push({ indice: i, gente, atras: frente - i >= 2 })
   }
   const soloVuelta = activos.filter(seSuma)
-  return { grupos, soloVuelta, frente, vanEnMicro }
+  return { grupos, soloVuelta, frente, vanEnMicro, noVinieron, bajas }
 }

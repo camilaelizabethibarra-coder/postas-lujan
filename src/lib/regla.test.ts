@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { reemplaza, proximaPosta, dondeEstan, esperadosEn, enMicro, clave, type Aviso, type Marca, type Persona } from './regla'
+import { reemplaza, proximaPosta, dondeEstan, esperadosEn, enMicro, participan, seBajaron, clave, type Aviso, type Marca, type Persona } from './regla'
 import { tabla } from './exportar'
 import { POSTAS_POR_DEFECTO as POSTAS } from './postas'
 
@@ -125,5 +125,20 @@ describe('dejé de caminar', () => {
     const r = dondeEstan([persona(1), persona(2)], marcas, POSTAS, new Set([1]))
     expect(r.vanEnMicro.map((p) => p.numero)).toEqual([1])
     expect(r.grupos.some((g) => g.gente.some((p) => p.numero === 1))).toBe(false)
+  })
+})
+
+describe('solo cuentan los que participan', () => {
+  it('sin pechera ni presente no se espera; con pechera o presente sí; el que se bajó no', () => {
+    const padron = [persona(1), persona(2, { pechera_ok: true }), persona(3), persona(4), persona(5, { tramo: 'solo_vuelta' })]
+    const marcas = mapa(m(3, 'pechera', 1), m(4, 'po1', 2))
+    const bajas = seBajaron([{ id: 'x', peregrino: 3, tipo: 'bajo', desde_posta: null, creado_en: t(3), resuelto: true }])
+    const f = { participan: participan(padron, marcas), bajas }
+    expect([...f.participan].sort()).toEqual([2, 3, 4, 5])
+    expect(esperadosEn(padron, marcas, POSTAS[0]!, new Set(), f).map((p) => p.numero)).toEqual([2, 4])
+    expect(esperadosEn(padron, marcas, POSTAS[4]!, new Set(), f).map((p) => p.numero)).toEqual([2, 4, 5])
+    const d = dondeEstan(padron, marcas, POSTAS, new Set(), f)
+    expect(d.noVinieron.map((p) => p.numero)).toEqual([1])
+    expect(d.bajas.map((p) => p.numero)).toEqual([3])
   })
 })

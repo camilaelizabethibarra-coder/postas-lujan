@@ -3,7 +3,7 @@ import { useDatos } from '../lib/datos'
 import { paraLlamar } from '../lib/padron'
 import { POSTAS_POR_DEFECTO as POSTAS } from '../lib/postas'
 import {
-  dondeEstan, esperadosEn, marcaDe, confirmada, ultimaPosta, enMicro, esPedido, type Persona,
+  dondeEstan, esperadosEn, marcaDe, confirmada, ultimaPosta, enMicro, esPedido, participan, seBajaron, type Persona,
 } from '../lib/regla'
 import { hora } from '../lib/exportar'
 import { Estado } from './comunes'
@@ -21,8 +21,9 @@ export function Donde({ alVerAyudas }: { alVerAyudas: () => void }) {
   const [persona, setPersona] = useState<number | null>(null)
 
   const micro = useMemo(() => enMicro(e.avisos), [e.avisos])
-  const { grupos, soloVuelta: seSuman, vanEnMicro } = useMemo(
-    () => dondeEstan(e.padron, e.marcas, POSTAS, micro), [e.padron, e.marcas, micro])
+  const filtro = useMemo(() => ({ participan: participan(e.padron, e.marcas), bajas: seBajaron(e.avisos) }), [e.padron, e.marcas, e.avisos])
+  const { grupos, soloVuelta: seSuman, vanEnMicro, noVinieron, bajas } = useMemo(
+    () => dondeEstan(e.padron, e.marcas, POSTAS, micro, filtro), [e.padron, e.marcas, micro, filtro])
   const pedidos = e.avisos.filter((a) => esPedido(a) && !a.resuelto)
   const conPedido = new Set(pedidos.map((a) => a.peregrino))
 
@@ -85,7 +86,7 @@ export function Donde({ alVerAyudas }: { alVerAyudas: () => void }) {
           {POSTAS.map((p, i) => {
             const g = grupo(i)
             const aca = g?.gente ?? []
-            const esperados = esperadosEn(e.padron, e.marcas, p, micro)
+            const esperados = esperadosEn(e.padron, e.marcas, p, micro, filtro)
             const conf = esperados.filter((x) => confirmada(e.marcas, p.id, x.numero)).length
             const pct = esperados.length ? Math.round((conf * 100) / esperados.length) : 0
             return (
@@ -113,6 +114,8 @@ export function Donde({ alVerAyudas }: { alVerAyudas: () => void }) {
           ['micro', '🚌 Dejaron de caminar, van en el micro', vanEnMicro],
           ['sin', '❓ Todavía no aparecen en ninguna parada', sinRegistro],
           ['suman', '⏩ Se suman más adelante (La Reja, Rodríguez, Liniers, solo vuelta)', seSuman],
+          ['bajas', '🛑 Se bajaron de la caminata', bajas],
+          ['novino', '🎽 Sin pechera todavía (no vinieron o no la retiraron): no cuentan', noVinieron],
         ].map(([k, t, gente]) => (gente as Persona[]).length > 0 && (
           <div key={k as string} class="grp">
             <button class="grp-tit" onClick={() => setAbierto(abierto === k ? null : (k as string))}>

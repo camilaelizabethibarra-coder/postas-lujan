@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks'
 import { useDatos, marcar } from '../lib/datos'
 import { normalizar } from '../lib/padron'
 import { POSTAS_POR_DEFECTO as POSTAS } from '../lib/postas'
-import { esperadosEn, marcaDe, confirmada, enMicro, esPedido } from '../lib/regla'
+import { esperadosEn, marcaDe, confirmada, enMicro, esPedido, participan, seBajaron } from '../lib/regla'
 import { hora } from '../lib/exportar'
 import { Estado } from './comunes'
 import { titulo } from './Peregrino'
@@ -28,7 +28,9 @@ export function Marcar({
   useEffect(() => setRecien(new Set()), [filtro, postaSel])
 
   const micro = useMemo(() => enMicro(e.avisos), [e.avisos])
-  const esperados = useMemo(() => esperadosEn(e.padron, e.marcas, posta, micro), [e.padron, e.marcas, posta, micro])
+  // se espera solo a quien participa (tiene pechera o ya apareció) y no se bajó
+  const quienes = useMemo(() => ({ participan: participan(e.padron, e.marcas), bajas: seBajaron(e.avisos) }), [e.padron, e.marcas, e.avisos])
+  const esperados = useMemo(() => esperadosEn(e.padron, e.marcas, posta, micro, quienes), [e.padron, e.marcas, posta, micro, quienes])
   // Presentismo: cuenta solo lo que confirmó el equipo. Lo que declaró el
   // peregrino con "Llegué" se ve, pero sigue en "faltan" hasta que alguien lo confirme.
   const pasaron = esperados.filter((p) => confirmada(e.marcas, posta.id, p.numero)).length
@@ -58,6 +60,7 @@ export function Marcar({
   function situacion(n: number) {
     const t: [string, string][] = []
     if (pedidoDe.get(n) === 'bajo') t.push(['baja', '🛑 No sigue: pidió que lo busquen'])
+    else if (quienes.bajas.has(n)) t.push(['baja', '🛑 Se bajó de la caminata'])
     if (pedidoDe.get(n) === 'ayuda') t.push(['ayuda', '🆘 Pidió ayuda'])
     if (micro.has(n)) t.push(['micro', '🚌 Va en el micro'])
     return t

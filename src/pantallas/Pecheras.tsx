@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'preact/hooks'
-import { useDatos, marcar } from '../lib/datos'
+import { useDatos, marcar, darDeBaja } from '../lib/datos'
 import { normalizar } from '../lib/padron'
 import {
   POSTA_PECHERA, POSTA_DEVUELTA, SALIDAS, comidaDe, postaDeSalida, retiroDe,
 } from '../lib/postas'
-import { confirmada, type Persona } from '../lib/regla'
+import { confirmada, seBajaron, type Persona } from '../lib/regla'
 import { hora } from '../lib/exportar'
 import { Estado } from './comunes'
 import { titulo } from './Peregrino'
@@ -79,12 +79,13 @@ export function Pecheras() {
     return { tono: 'ok', texto: nombre, detalle: 'Devolvió la pechera' }
   }
 
+  const bajas = seBajaron(e.avisos)
   const entregadas = conPechera.filter(entregada)
   const devueltas = conPechera.filter((p) => devuelta(p))
   const faltan = (modo === 'entrega'
     ? conPechera.filter((p) => !entregada(p))
     : entregadas.filter((p) => !devuelta(p))
-  ).filter((p) => !salida || p.tramo === salida)
+  ).filter((p) => (!salida || p.tramo === salida) && !bajas.has(p.numero))
 
   return (
     <>
@@ -171,6 +172,13 @@ export function Pecheras() {
               devueltaEn={devuelta(p)?.marcado_en}
               alEntregar={() => entregar(p)}
               alDevolver={() => { setEco(devolver(p.numero)); setQ('') }}
+              baja={bajas.has(p.numero)}
+              alBaja={() => {
+                if (!confirm(`¿${titulo(p.nombre)} ${titulo(p.apellido)} se bajó de la caminata? Deja de contar como faltante.`)) return
+                darDeBaja(p.numero)
+                setEco({ tono: 'ok', texto: `${p.numero} · ${titulo(p.nombre)} ${titulo(p.apellido)}`, detalle: 'Quedó como que se bajó: ya no cuenta como faltante' })
+                setQ('')
+              }}
             />
           ))}
           {q.trim().length >= 2 && !resultados.length && (
@@ -208,8 +216,10 @@ export function Pecheras() {
 }
 
 function Tarjeta({
-  p, modo, entregadaEn, devueltaEn, alEntregar, alDevolver,
+  p, modo, entregadaEn, devueltaEn, alEntregar, alDevolver, baja, alBaja,
 }: {
+  baja: boolean
+  alBaja: () => void
   p: Persona
   modo: Modo
   entregadaEn?: string
@@ -255,6 +265,11 @@ function Tarjeta({
         <div class="tp-estado">✓ Devolvió la pechera a las {hora(devueltaEn)}</div>
       ) : (
         <button class="btn" onClick={alDevolver}>↩ Devolvió la pechera</button>
+      )}
+      {baja ? (
+        <div class="tp-estado" style="color: var(--alerta)">🛑 Se bajó de la caminata: no cuenta como faltante</div>
+      ) : p.tramo !== 'solo_vuelta' && (
+        <button class="btn sec" onClick={alBaja}>🛑 Se dio de baja / se bajó</button>
       )}
     </div>
   )

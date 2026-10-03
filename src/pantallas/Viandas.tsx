@@ -2,7 +2,7 @@ import { useMemo, useState } from 'preact/hooks'
 import { useDatos, marcar } from '../lib/datos'
 import { normalizar } from '../lib/padron'
 import { POSTA_VIANDA, comidaDe } from '../lib/postas'
-import { confirmada, type Persona } from '../lib/regla'
+import { confirmada, participan, type Persona } from '../lib/regla'
 import { hora } from '../lib/exportar'
 import { Estado } from './comunes'
 import { titulo } from './Peregrino'
@@ -25,7 +25,11 @@ export function Viandas() {
   const [escaneando, setEscaneando] = useState(false)
 
   // quien solo hace la vuelta no pasa por La Reja
-  const todos = useMemo(() => e.padron.filter((p) => p.activo && p.tramo !== 'solo_vuelta'), [e.padron])
+  // los que vinieron (tienen pechera o ya aparecieron) y el equipo
+  const todos = useMemo(() => {
+    const vinieron = participan(e.padron, e.marcas)
+    return e.padron.filter((p) => p.activo && p.tramo !== 'solo_vuelta' && (p.es_equipo || vinieron.has(p.numero)))
+  }, [e.padron, e.marcas])
   const entregada = (p: Persona) => confirmada(e.marcas, POSTA_VIANDA.id, p.numero)
   const tipoDe = (p: Persona) => comidaDe(p.comida) ?? SIN
 
