@@ -8,6 +8,7 @@ import { proximaPosta, enMicro, esPedido, type Persona, type Ubicacion } from '.
 import { hora } from '../lib/exportar'
 import { Estado, Instalar, Portada, Festejo } from './comunes'
 import { svgDe } from '../lib/qr'
+import { Carta } from './Carta'
 
 /**
  * El peregrino. Tres toques como techo desde que abre el link: tocar su
@@ -347,6 +348,8 @@ function Principal({ yo, alSalir, alCambiarSalida }: { yo: Persona; alSalir: () 
   }, [ultima])
 
   const voyEnMicro = enMicro(e.avisos).has(yo.numero)
+  // llegó a Luján o subió al micro (lo marcó él o lo confirmó el equipo): la carta del equipo
+  const llego = ['po4', 'po5'].some((id) => e.marcas.get(`${id}|${yo.numero}`)?.presente)
   const prox = proximaPosta(e.marcas, POSTAS, yo, voyEnMicro)
   const recien = ultima ? POSTAS.find((p) => p.id === ultima.posta) : undefined
   const miAviso = e.avisos.find((a) => a.peregrino === yo.numero && esPedido(a) && !a.resuelto)
@@ -407,6 +410,7 @@ function Principal({ yo, alSalir, alCambiarSalida }: { yo: Persona; alSalir: () 
       <Portada compacta />
       <div class="centro" style="padding-top: 8px">
         <MiQR yo={yo} />
+        {llego && <Carta numero={yo.numero} />}
 
         {voyEnMicro && (
           <div class="caja micro">
