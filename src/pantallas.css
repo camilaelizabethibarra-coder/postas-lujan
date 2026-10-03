@@ -599,3 +599,5 @@
 
 .cambiar-salida { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tenue); }
 .cambiar-salida select { flex: 1; font: inherit; font-size: 16px; color: var(--texto); background: var(--fondo); border: 1px solid var(--borde); border-radius: 10px; padding: 9px 10px; }
+
+.fila .sacar { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 800; color: var(--alerta); background: var(--alerta-suave); margin-right: 6px; }

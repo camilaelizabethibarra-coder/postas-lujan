@@ -62,10 +62,19 @@ export function Pecheras() {
 
   function entregar(p: Persona) {
     if (!entregada(p)) marcar(p.numero, POSTA_PECHERA.id, 'resp', true)
+    // Presente solo si la pechera se entrega EN su salida: Morón (la
+    // parroquia) o Liniers (la retiran en La Reja). Los de La Reja y
+    // Rodríguez la retiran en la parroquia a las 9: el presente se lo dan
+    // cuando llegan a su parada.
     const s = postaDeSalida(p.tramo)
-    if (!confirmada(e.marcas, s.id, p.numero)) marcar(p.numero, s.id, 'resp', true)
+    const enSuSalida = p.tramo === 'completo' || p.tramo === 'liniers'
+    if (enSuSalida && !confirmada(e.marcas, s.id, p.numero)) marcar(p.numero, s.id, 'resp', true)
     navigator.vibrate?.(50)
-    setEco({ tono: 'ok', texto: `Pechera ${p.numero} · ${titulo(p.nombre)} ${titulo(p.apellido)}`, detalle: `Entregada y presente en ${s.nombre}` })
+    setEco({
+      tono: 'ok',
+      texto: `Pechera ${p.numero} · ${titulo(p.nombre)} ${titulo(p.apellido)}`,
+      detalle: enSuSalida ? `Entregada y presente en ${s.nombre}` : `Entregada. El presente se lo dan al llegar a ${s.nombre}.`,
+    })
     setQ('')
   }
 
@@ -129,8 +138,9 @@ export function Pecheras() {
       <div class="cpo">
         {modo === 'entrega' ? (
           <p class="paso-a-paso">
-            <b>1.</b> Pedile el DNI y escribilo. <b>2.</b> Decile su número de pechera.
-            <b> 3.</b> Tocá <b>Entregar</b>: queda con pechera y presente en su salida.
+            <b>1.</b> Pedile el DNI, el apellido o el número. <b>2.</b> Decile su número de pechera.
+            <b> 3.</b> Tocá <b>Entregar</b>. Los de Morón (y Liniers en La Reja) quedan además presentes;
+            los de La Reja y Rodríguez reciben el presente al llegar a su parada.
           </p>
         ) : (
           <>
@@ -272,10 +282,14 @@ function Tarjeta({
             <div class="tp-estado">
               ✓ Ya tiene pechera {entregadaEn === 'antes' ? '(la retiró antes, según la planilla)' : `(entregada a las ${hora(entregadaEn)})`}
             </div>
-            <button class="btn sec" onClick={alEntregar}>Dar presente en su salida</button>
+            {(p.tramo === 'completo' || p.tramo === 'liniers') && (
+              <button class="btn sec" onClick={alEntregar}>Dar presente en su salida</button>
+            )}
           </>
         ) : (
-          <button class="btn" onClick={alEntregar}>🎽 Entregar pechera {p.numero} y dar presente</button>
+          <button class="btn" onClick={alEntregar}>
+            🎽 Entregar pechera {p.numero}{p.tramo === 'completo' || p.tramo === 'liniers' ? ' y dar presente' : ''}
+          </button>
         )
       ) : devueltaEn ? (
         <div class="tp-estado">✓ Devolvió la pechera a las {hora(devueltaEn)}</div>

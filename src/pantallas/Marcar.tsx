@@ -229,6 +229,18 @@ export function Marcar({
                     </small>
                   )}
                 </span>
+                {m?.via === 'peregrino' && (
+                  <span
+                    class="sacar"
+                    role="button"
+                    onClick={(ev) => {
+                      ev.stopPropagation()
+                      if (confirm(`¿Sacar el "Llegué" de ${p.apellido}? Le vuelve a aparecer para marcarlo bien.`)) {
+                        marcar(p.numero, posta.id, 'resp', false)
+                      }
+                    }}
+                  >✕</span>
+                )}
                 <span class="mar">{m ? (m.via === 'resp' ? '✓' : '?') : ''}</span>
               </button>
             )
