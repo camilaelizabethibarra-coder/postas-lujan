@@ -2,7 +2,7 @@ import { useMemo, useState } from 'preact/hooks'
 import { useDatos, marcar } from '../lib/datos'
 import { normalizar } from '../lib/padron'
 import { POSTA_VIANDA, comidaDe } from '../lib/postas'
-import { confirmada, participan, type Persona } from '../lib/regla'
+import { confirmada, participan, seBajaron, type Persona } from '../lib/regla'
 import { hora } from '../lib/exportar'
 import { Estado } from './comunes'
 import { titulo } from './Peregrino'
@@ -48,7 +48,13 @@ export function Viandas() {
 
   const dadas = todos.filter(entregada).length
   // lo importante: los que no pueden comer la vianda común (peregrinos y equipo)
-  const especiales = todos.filter((p) => comidaDe(p.comida))
+  // todos los anotados con dieta especial (vinieron o no todavía), menos los que se bajaron:
+  // es lo que hay que preparar
+  const bajas = seBajaron(e.avisos)
+  const especiales = e.padron.filter(
+    (p) => p.activo && p.tramo !== 'solo_vuelta' && comidaDe(p.comida) && !bajas.has(p.numero))
+  const porDieta = new Map<string, number>()
+  for (const p of especiales) porDieta.set(comidaDe(p.comida)!, (porDieta.get(comidaDe(p.comida)!) ?? 0) + 1)
 
   const lista = useMemo(() => {
     const b = normalizar(busq)
@@ -116,6 +122,12 @@ export function Viandas() {
             <div class="esp-tit">
               ⚠ Restricciones alimentarias
               <span>{especiales.filter(entregada).length} de {especiales.length} entregadas</span>
+            </div>
+            <div class="dietas">
+              <b>{especiales.length} dietas especiales</b>
+              {[...porDieta.entries()].sort((a, b) => b[1] - a[1]).map(([k, n]) => (
+                <span key={k}><em>{n}</em> {k}</span>
+              ))}
             </div>
             <p class="paso-a-paso" style="margin: 0 0 8px">Separá estas viandas antes. No les des la común.</p>
             {especiales.map((p) => {
