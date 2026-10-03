@@ -7,7 +7,7 @@
  * persona ya esté en el servidor cuando le pedimos lo que marcaron los demás.
  */
 import {
-  estado, avisar, leerCola, sacarDeCola, aplicarRemotas, aplicarAvisos, aplicarUbicaciones,
+  estado, avisar, leerCola, sacarDeCola, aplicarRemotas, aplicarAvisos, aplicarUbicaciones, podarAntesDe,
   reemplazarPadron, cuandoSeEncole, meta, guardarMeta,
 } from './datos'
 import { remoto, ErrorSesion, ErrorHuerfano } from './remoto'
@@ -131,12 +131,27 @@ async function bajar(): Promise<void> {
   }
 }
 
+/**
+ * Antes de subir nada: si la base se limpió desde la última vez, se borran
+ * de este celular las pruebas de antes de esa hora. Si no, una marca de
+ * prueba guardada acá volvería a subir y ensuciaría la base limpia.
+ */
+async function revisarReinicio(): Promise<void> {
+  const r = await remoto.bajarReinicio()
+  if (!r || (await meta<string>('reinicio')) === r) return
+  await podarAntesDe(r)
+  await guardarMeta('reinicio', r)
+  // y el cursor de marcas vuelve a empezar, para bajar todo lo nuevo
+  await guardarMeta('cursor', null)
+}
+
 export async function sincronizar(): Promise<void> {
   if (corriendo) { otraVez = true; return }
   corriendo = true
   try {
     do {
       otraVez = false
+      await revisarReinicio()
       await subir()
       await bajar()
     } while (otraVez)

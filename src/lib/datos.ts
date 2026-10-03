@@ -313,6 +313,46 @@ export async function sacarDeCola(ids: number[]): Promise<void> {
   avisar()
 }
 
+/**
+ * La base se limpió (pruebas): se borra de este celular todo lo que sea de
+ * antes de esa hora. Lo marcado después no se toca, aunque esté sin subir.
+ */
+export async function podarAntesDe(iso: string): Promise<number> {
+  const corte = Date.parse(iso)
+  const viejo = (t: string) => Date.parse(t) < corte
+  const d = await base()
+  let n = 0
+
+  const marcas = [...estado.marcas.values()].filter((m) => viejo(m.marcado_en))
+  if (marcas.length) {
+    const tx = d.transaction('marcas', 'readwrite')
+    await Promise.all([...marcas.map((m) => tx.store.delete([m.posta, m.peregrino])), tx.done])
+    const nuevas = new Map(estado.marcas)
+    for (const m of marcas) nuevas.delete(clave(m.posta, m.peregrino))
+    estado.marcas = nuevas
+    n += marcas.length
+  }
+
+  const avisos = estado.avisos.filter((a) => viejo(a.creado_en))
+  if (avisos.length) {
+    const tx = d.transaction('avisos', 'readwrite')
+    await Promise.all([...avisos.map((a) => tx.store.delete(a.id)), tx.done])
+    const ids = new Set(avisos.map((a) => a.id))
+    estado.avisos = estado.avisos.filter((a) => !ids.has(a.id))
+    n += avisos.length
+  }
+
+  const cola = await leerCola()
+  const fuera = cola.filter((p) =>
+    (p.tipo === 'marca' && viejo(p.marca.marcado_en)) ||
+    (p.tipo === 'aviso' && viejo(p.aviso.creado_en)) ||
+    (p.tipo === 'resolver' && !estado.avisos.some((a) => a.id === p.avisoId)))
+  if (fuera.length) await sacarDeCola(fuera.map((p) => p.id!))
+
+  avisar()
+  return n
+}
+
 /** Para la demo: empezar de cero. */
 export async function borrarTodo(): Promise<void> {
   const d = await base()

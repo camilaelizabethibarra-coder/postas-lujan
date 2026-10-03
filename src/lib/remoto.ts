@@ -22,6 +22,8 @@ export interface Remoto {
   subirAvisos(avisos: Aviso[]): Promise<void>
   resolver(token: string | null, id: string): Promise<void>
   elegirSalida(numero: number, tramo: string): Promise<void>
+  /** Hora del último "limpiar la base" (o null). */
+  bajarReinicio(): Promise<string | null>
   bajarUbicaciones(token: string | null): Promise<(Ubicacion & { aviso: string; tomada_en: string })[]>
   bajarMarcas(desde: string | null, peregrino?: number): Promise<MarcaServidor[]>
   bajarAvisos(peregrino?: number): Promise<Aviso[]>
@@ -65,6 +67,14 @@ const supabaseRemoto: Remoto = {
     const db = await supa()
     const { error } = await conTope(db.rpc('resolver_aviso', { p_token: token ?? '', p_id: id }))
     revisar(error)
+  },
+
+  async bajarReinicio() {
+    const db = await supa()
+    const { data, error } = await conTope(db.from('ajustes').select('reinicio').eq('id', 1).maybeSingle())
+    // si la tabla todavía no existe, no hay reinicio: no frena nada
+    if (error) return null
+    return (data?.reinicio as string | null) ?? null
   },
 
   async elegirSalida(numero, tramo) {
@@ -142,6 +152,7 @@ const demoRemoto: Remoto = {
   subirAvisos: red,
   resolver: red,
   elegirSalida: red,
+  async bajarReinicio() { return null },
   async bajarUbicaciones() { await red(); return [] },
   async bajarMarcas() { await red(); return [] },
   async bajarAvisos() { await red(); return [] },
