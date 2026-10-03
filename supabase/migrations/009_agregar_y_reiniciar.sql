@@ -109,8 +109,9 @@ begin
   if rol_de_token(p_token) is distinct from 'coordinador' then
     raise exception 'Solo el equipo coordinador (sesión)' using errcode = '42501';
   end if;
-  delete from marcas; get diagnostics v_m = row_count;
-  delete from avisos; get diagnostics v_a = row_count;   -- y sus ubicaciones, en cascada
+  -- 'where true': Supabase no deja borrar sin condición (protección contra accidentes)
+  delete from marcas where true; get diagnostics v_m = row_count;
+  delete from avisos where true; get diagnostics v_a = row_count;   -- y sus ubicaciones, en cascada
   delete from peregrinos where numero >= 99000;
   return v_m || ' marcas y ' || v_a || ' avisos borrados';
 end;
