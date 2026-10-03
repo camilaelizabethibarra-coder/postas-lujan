@@ -43,6 +43,8 @@ export function Viandas() {
   }, [todos, e.marcas])
 
   const dadas = todos.filter(entregada).length
+  // lo importante: los que no pueden comer la vianda común (peregrinos y equipo)
+  const especiales = todos.filter((p) => comidaDe(p.comida))
 
   const lista = useMemo(() => {
     const b = normalizar(busq)
@@ -105,6 +107,30 @@ export function Viandas() {
       </div>
 
       <div class="cpo">
+        {especiales.length > 0 && (
+          <div class="especiales">
+            <div class="esp-tit">
+              ⚠ Restricciones alimentarias
+              <span>{especiales.filter(entregada).length} de {especiales.length} entregadas</span>
+            </div>
+            <p class="paso-a-paso" style="margin: 0 0 8px">Separá estas viandas antes. No les des la común.</p>
+            {especiales.map((p) => {
+              const m = entregada(p)
+              return (
+                <button key={p.numero} class={`vesp ${m ? "dada" : ""}`} onClick={() => tocar(p)}>
+                  <span class="esp-tipo">{comidaDe(p.comida)}</span>
+                  <span class="esp-quien">
+                    <b>{titulo(p.nombre)} {titulo(p.apellido)}</b>
+                    <span>{p.es_equipo ? 'Equipo' : `Pechera ${p.numero}`}{m ? ` · ✓ entregada ${hora(m.marcado_en)}` : ' · tocá cuando se la des'}</span>
+                  </span>
+                  <span class="mar">{m ? '✓' : ''}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        <div class="h">Viandas comunes</div>
         <button class="btn escanear" onClick={() => setEscaneando(true)}>📷 Escanear QR para entregar</button>
         {escaneando && <Escaner titulo="Entrega de viandas" alLeer={entregar} alCerrar={() => setEscaneando(false)} />}
 

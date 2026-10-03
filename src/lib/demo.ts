@@ -77,6 +77,9 @@ export function datosDemo(): { padron: Persona[]; marcas: Marca[]; avisos: Aviso
       tramo: 'completo',
       nota: null,
       activo: true,
+      // DNI inventados: 30.000.000 + número
+      dni: String(30000000 + numero),
+      pechera_ok: numero % 17 === 0,
     }
   }
 

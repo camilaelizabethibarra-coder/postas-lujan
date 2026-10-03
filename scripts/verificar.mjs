@@ -1,7 +1,7 @@
 /**
  * Verifica contra la base real que el esquema quedó bien.
  *
- *   node scripts/verificar.mjs <PIN-de-Morón>
+ *   node scripts/verificar.mjs <PIN-del-coordinador>
  *
  * Prueba las dos cosas que no se pueden dar por sentadas:
  *
@@ -124,18 +124,18 @@ prueba('una marca "confirmada" sin sesión se rechaza', respSinToken.estado >= 4
 
 if (!PIN) {
   console.log('\nSin PIN no puedo probar la regla de conflictos.')
-  console.log('Corré:  node scripts/verificar.mjs <PIN-de-Morón>\n')
+  console.log('Corré:  node scripts/verificar.mjs <PIN-del-coordinador>\n')
   process.exitCode = mal ? 1 : 0
   return
 }
 
 console.log('\nSesión de responsable')
 
-const sesion = await rpc('abrir_posta', { p_posta: 'po1', p_pin: PIN })
+const sesion = await rpc('abrir_rol', { p_rol: 'coordinador', p_pin: PIN })
 prueba('el PIN abre sesión', sesion.estado === 200 && typeof sesion.cuerpo === 'string',
   JSON.stringify(sesion.cuerpo))
 
-const malPin = await rpc('abrir_posta', { p_posta: 'po1', p_pin: '000000' })
+const malPin = await rpc('abrir_rol', { p_rol: 'coordinador', p_pin: '000000' })
 prueba('un PIN incorrecto no abre sesión', malPin.estado >= 400)
 
 if (sesion.estado !== 200) {

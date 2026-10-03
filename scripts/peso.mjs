@@ -24,12 +24,11 @@ function archivos(dir) {
 }
 
 const todos = archivos('dist')
-const critico = todos.filter(
-  (f) =>
-    f.endsWith('index.html') ||
-    (/assets[\\/]index-.*\.css$/.test(f)) ||
-    (/assets[\\/]index-.*\.js$/.test(f)),
-)
+// Lo que index.html pide de entrada (script de módulo y hoja de estilos), y
+// nada más: los import() diferidos (QR, Excel, escáner) no cuentan.
+const html = readFileSync(join('dist', 'index.html'), 'utf8')
+const pedidos = [...html.matchAll(/(?:src|href)="\/?(assets\/[^"]+\.(?:js|css))"/g)].map((m) => m[1])
+const critico = [join('dist', 'index.html'), ...pedidos.map((a) => join('dist', a))]
 
 let total = 0
 console.log('\nPrimer load:')

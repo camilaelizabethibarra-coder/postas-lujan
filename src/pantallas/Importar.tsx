@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import { importar, type Fila } from '../lib/padron'
 
 /**
@@ -10,9 +10,15 @@ import { importar, type Fila } from '../lib/padron'
  * quien importa tiene que ver que eso se resolvió como corresponde.
  */
 export function Importar({
-  guardar, alTerminar,
-}: { guardar: (filas: Fila[]) => Promise<number>; alTerminar: (n: number) => void }) {
+  guardar, alTerminar, cargado,
+}: {
+  guardar: (filas: Fila[]) => Promise<number>
+  alTerminar: (n: number) => void
+  /** El texto que salió de leer un Excel: se muestra igual que si se hubiera pegado. */
+  cargado?: string | null
+}) {
   const [pegado, setPegado] = useState('')
+  useEffect(() => { if (cargado) setPegado(cargado) }, [cargado])
   const [yendo, setYendo] = useState(false)
   const [error, setError] = useState('')
 
@@ -46,8 +52,8 @@ export function Importar({
           solo, y si no hay, leo en orden número, apellido, nombre, micro, celular.
         </p>
         <p class="aviso">
-          <b>El DNI y los pagos no entran</b>, aunque los pegues. Eso se queda en la planilla de
-          la parroquia. La comida sí entra, para las viandas, y solo la ve el equipo.
+          <b>Los pagos no entran</b>, aunque los pegues: se quedan en la planilla. El DNI y la
+          comida sí entran, pero el DNI solo lo ve el equipo coordinador.
         </p>
         <textarea
           class="area"

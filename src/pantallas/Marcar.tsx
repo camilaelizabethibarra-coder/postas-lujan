@@ -23,6 +23,7 @@ export function Marcar({
   const [num, setNum] = useState('')
   const [eco, setEco] = useState<{ ok: boolean; texto: string } | null>(null)
   const [escaneando, setEscaneando] = useState(false)
+  const [cambiando, setCambiando] = useState(false)
 
   useEffect(() => setRecien(new Set()), [filtro, postaSel])
 
@@ -48,6 +49,19 @@ export function Marcar({
   }, [esperados, e.marcas, posta, filtro, busq, recien])
 
   const avisosAbiertos = e.avisos.filter((a) => esPedido(a) && !a.resuelto).length
+  // la situación de cada uno, para verla en la lista y al escanear
+  const pedidoDe = useMemo(() => {
+    const m = new Map<number, 'ayuda' | 'bajo'>()
+    for (const a of e.avisos) if (esPedido(a) && !a.resuelto) m.set(a.peregrino, a.tipo as 'ayuda' | 'bajo')
+    return m
+  }, [e.avisos])
+  function situacion(n: number) {
+    const t: [string, string][] = []
+    if (pedidoDe.get(n) === 'bajo') t.push(['baja', '🛑 No sigue: pidió que lo busquen'])
+    if (pedidoDe.get(n) === 'ayuda') t.push(['ayuda', '🆘 Pidió ayuda'])
+    if (micro.has(n)) t.push(['micro', '🚌 Va en el micro'])
+    return t
+  }
 
   function tocar(numero: number) {
     const m = marcaDe(e.marcas, posta.id, numero)
@@ -71,7 +85,11 @@ export function Marcar({
     const m = marcaDe(e.marcas, posta.id, n)
     if (m?.via === 'resp') return { tono: 'ya', texto: nombre, detalle: `Ya estaba presente (${hora(m.marcado_en)})` }
     marcar(n, posta.id, 'resp', true)
-    const detalle = [micro.has(n) && '🚌 figuraba en el micro', p.nota].filter(Boolean).join(' · ')
+    const detalle = [
+      ...situacion(n).map((x) => x[1]),
+      posta.id === 'po5' && '↩ Pedile la pechera',
+      p.nota,
+    ].filter(Boolean).join(' · ')
     return { tono: 'ok', texto: nombre, detalle: detalle || `Presente en ${posta.nombre}` }
   }
 
@@ -87,13 +105,24 @@ export function Marcar({
     <>
       <div class="cab">
         <div class="lema-equipo"><b>EQUIPO</b> Servicio y pasión, por amar, por vivir</div>
-        <div class="postas-tabs">
-          {POSTAS.map((p, i) => (
-            <button key={p.id} class={`ptab ${i === postaSel ? 'act' : ''}`} onClick={() => setPostaSel(i)}>
-              {p.nombre}
-            </button>
-          ))}
+        <div class="parada-actual">
+          <span>ESTOY EN</span>
+          <b>{posta.nombre}</b>
+          <button onClick={() => setCambiando(!cambiando)}>{cambiando ? 'Cerrar' : 'Cambiar'}</button>
         </div>
+        {cambiando && (
+          <div class="elegir-parada">
+            {POSTAS.map((p, i) => (
+              <button
+                key={p.id}
+                class={`btn ${i === postaSel ? '' : 'sec'}`}
+                onClick={() => { setPostaSel(i); setCambiando(false) }}
+              >
+                {p.nombre}
+              </button>
+            ))}
+          </div>
+        )}
         <div class="cont">
           <span class="n">{pasaron}</span>
           <span class="de">de {esperados.length} presentes</span>
@@ -122,6 +151,11 @@ export function Marcar({
           </button>
         )}
 
+        <p class="paso-a-paso">
+          Para dar el presente: <b>escaneá el QR</b> de la pechera (o del celular), o escribí el número.
+          Lo que el peregrino marca solo con "Llegué" queda en verde hasta que lo confirmes.
+          {posta.id === 'po5' && <b> En la subida al micro, pedile también la pechera.</b>}
+        </p>
         <button class="btn escanear" onClick={() => setEscaneando(true)}>📷 Escanear QR de las pecheras</button>
         {escaneando && (
           <Escaner titulo={`Presente en ${posta.nombre}`} alLeer={darPresente} alCerrar={() => setEscaneando(false)} />
@@ -183,10 +217,12 @@ export function Marcar({
                     <small>
                       {m.via === 'resp' ? 'presente' : 'dice que llegó · tocá para confirmar'} · {hora(m.marcado_en)}
                     </small>
-                  ) : (p.micro || p.nota || micro.has(p.numero)) && (
+                  ) : (p.micro || p.nota) && (
+                    <small>{[p.micro && `micro ${p.micro}`, p.nota].filter(Boolean).join(' · ')}</small>
+                  )}
+                  {situacion(p.numero).length > 0 && (
                     <small>
-                      {[micro.has(p.numero) && '🚌 va en el micro', p.micro && `micro ${p.micro}`, p.nota]
-                        .filter(Boolean).join(' · ')}
+                      {situacion(p.numero).map(([k, t]) => <span key={k} class={`estado-p ${k}`}>{t}</span>)}
                     </small>
                   )}
                 </span>

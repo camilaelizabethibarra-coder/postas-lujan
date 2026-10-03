@@ -13,7 +13,7 @@ const ENCABEZADO =
   'Peregrino NUMERO,APELLIDO ,NOMBRE,DNI,CEL,CEL DE EMERGENCIA,COMIDA,$$$$$$,,TIEMPO DE ABONADO'
 
 describe('importar', () => {
-  it('lee la planilla y deja afuera DNI y pagos', () => {
+  it('lee la planilla, guarda el DNI y deja afuera los pagos', () => {
     const { filas } = importar(
       [
         ENCABEZADO,
@@ -31,7 +31,7 @@ describe('importar', () => {
       es_equipo: false,
     })
     // lo que no tiene que estar
-    expect(JSON.stringify(filas[0])).not.toContain('30000003')
+    expect(filas[0]!.dni).toBe('30000003')
     expect(JSON.stringify(filas[0])).not.toContain('SIN RESTRICCION')
     expect(JSON.stringify(filas[0])).not.toContain('35,000')
   })
@@ -39,7 +39,8 @@ describe('importar', () => {
   it('avisa qué columnas descartó, para que quien importa lo vea', () => {
     const { avisos } = importar([ENCABEZADO, '1,PEREZ,ANA,30000003,,,,,,'].join('\n'))
     const texto = avisos.map((a) => a.texto).join(' ')
-    expect(texto).toContain('DNI')
+    expect(texto).toContain('TIEMPO DE ABONADO')
+    expect(texto).not.toContain('DNI')
     expect(texto).not.toContain('COMIDA')
   })
 

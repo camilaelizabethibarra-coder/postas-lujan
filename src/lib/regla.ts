@@ -53,6 +53,10 @@ export type Persona = {
   comida?: string | null
   /** Ya tiene salida definida (planilla o elegida): no se le pregunta. */
   salida_ok?: boolean
+  /** Solo le llega al equipo coordinador, para encontrar a cada uno en la parroquia. */
+  dni?: string | null
+  /** La planilla dice que ya retiró la pechera antes del día. */
+  pechera_ok?: boolean
 }
 
 export const clave = (posta: string, peregrino: number) => `${posta}|${peregrino}`

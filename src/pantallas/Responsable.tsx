@@ -1,31 +1,38 @@
 import { useEffect, useState } from 'preact/hooks'
 import { useDatos } from '../lib/datos'
 import { arrancar } from '../lib/sync'
-import { cerrarSesion, entrarSinPin, postaGuardada, tokenGuardado } from '../lib/supabase'
+import {
+  cerrarSesion, entrarSinPin, guardarPosta, postaGuardada, rolGuardado, tokenGuardado, type Rol,
+} from '../lib/supabase'
 import { esDemo } from '../lib/demo'
 import { POSTAS_POR_DEFECTO as POSTAS } from '../lib/postas'
+import { esPedido } from '../lib/regla'
 import { Pin } from './Pin'
 import { Marcar } from './Marcar'
 import { Donde } from './Donde'
-import { esPedido } from '../lib/regla'
+import { Ayudas } from './Ayudas'
 import { Datos } from './Datos'
 import { Viandas } from './Viandas'
+import { Pecheras } from './Pecheras'
 import { QRs } from './QRs'
 
-type Vista = 'marcar' | 'viandas' | 'donde' | 'datos' | 'qr'
+type Vista = 'pecheras' | 'marcar' | 'viandas' | 'ayudas' | 'donde' | 'datos' | 'qr'
+
+/** Las viandas se entregan solo en La Reja: en el resto de las paradas la pestaña no aparece. */
+const POSTA_VIANDAS = 'po2'
 
 export function Responsable() {
-  // la demo no pide PIN: arranca parada en General Rodríguez, donde está llegando el pelotón
-  if (esDemo() && !tokenGuardado()) entrarSinPin('po3')
+  // la demo no pide PIN: entra como coordinador, parada en General Rodríguez
+  if (esDemo() && (!tokenGuardado() || !rolGuardado())) entrarSinPin('po3')
 
   const [token, setToken] = useState(tokenGuardado())
-  const [posta, setPosta] = useState(postaGuardada())
+  const [rol, setRol] = useState(rolGuardado())
 
-  if (!token || !posta) {
+  if (!token || !rol) {
     return (
       <Pin
-        alEntrar={(p) => {
-          setPosta(p)
+        alEntrar={(r) => {
+          setRol(r)
           setToken(tokenGuardado())
         }}
       />
@@ -34,53 +41,69 @@ export function Responsable() {
 
   return (
     <Tablero
-      posta={posta}
+      rol={rol}
       alSalir={() => {
         cerrarSesion()
         setToken(null)
-        setPosta(null)
+        setRol(null)
       }}
     />
   )
 }
 
-function Tablero({ posta, alSalir }: { posta: string; alSalir: () => void }) {
+function Tablero({ rol, alSalir }: { rol: Rol; alSalir: () => void }) {
   const e = useDatos()
-  const [vista, setVista] = useState<Vista>('marcar')
-  const [postaSel, setPostaSel] = useState(Math.max(0, POSTAS.findIndex((p) => p.id === posta)))
+  const coord = rol === 'coordinador'
+  const [vista, setVista] = useState<Vista>(coord ? 'pecheras' : 'marcar')
+  const [postaSel, setPostaSelLocal] = useState(
+    Math.max(0, POSTAS.findIndex((p) => p.id === postaGuardada())),
+  )
+  const setPostaSel = (i: number) => {
+    setPostaSelLocal(i)
+    guardarPosta(POSTAS[i]!.id)
+  }
 
   useEffect(() => { arrancar({ rol: 'resp' }) }, [])
   useEffect(() => { scrollTo(0, 0) }, [vista])
 
+  const enLaReja = POSTAS[postaSel]?.id === POSTA_VIANDAS
+  // si se cambia de parada estando en Viandas, se vuelve a Presente
+  useEffect(() => { if (vista === 'viandas' && !enLaReja) setVista('marcar') }, [enLaReja])
+
   if (!e.listo) return null
-  const hayAvisos = e.avisos.some((a) => esPedido(a) && !a.resuelto)
+  const pedidos = e.avisos.filter((a) => esPedido(a) && !a.resuelto).length
+
+  const pestañas: [Vista, string, string][] = [
+    ...(coord ? [['pecheras', '🎽', 'Pecheras'] as [Vista, string, string]] : []),
+    ['marcar', '✓', 'Presente'],
+    ...(enLaReja ? [['viandas', '🥪', 'Viandas'] as [Vista, string, string]] : []),
+    ['ayudas', '🆘', 'Ayudas'],
+    ['donde', '🗺', 'Dónde están'],
+    ['datos', '⚙', coord ? 'Planilla' : 'Ajustes'],
+  ]
 
   return (
     <div class="pantalla">
+      {vista === 'pecheras' && coord && <Pecheras />}
       {vista === 'marcar' && (
-        <Marcar postaSel={postaSel} setPostaSel={setPostaSel} alVerAvisos={() => setVista('donde')} />
+        <Marcar postaSel={postaSel} setPostaSel={setPostaSel} alVerAvisos={() => setVista('ayudas')} />
       )}
       {vista === 'viandas' && <Viandas />}
-      {vista === 'donde' && <Donde />}
+      {vista === 'ayudas' && <Ayudas />}
+      {vista === 'donde' && <Donde alVerAyudas={() => setVista('ayudas')} />}
       {vista === 'datos' && (
-        <Datos
-          postaNombre={POSTAS.find((p) => p.id === posta)?.nombre ?? posta}
-          alSalir={alSalir}
-          alVerQR={() => setVista('qr')}
-        />
+        <Datos rol={rol} alSalir={alSalir} alVerQR={() => setVista('qr')} />
       )}
       {vista === 'qr' && <QRs alVolver={() => setVista('datos')} />}
 
-      <nav class="tabs">
-        {([['marcar', '◉', 'Presente'], ['viandas', '🥪', 'Viandas'], ['donde', '⌖', 'Dónde están'], ['datos', '⚙', 'Datos']] as const).map(
-          ([k, icono, texto]) => (
-            <button key={k} class={`tab ${vista === k ? 'act' : ''}`} onClick={() => setVista(k)}>
-              {k === 'donde' && hayAvisos && <span class="dot" />}
-              <i>{icono}</i>
-              {texto}
-            </button>
-          ),
-        )}
+      <nav class={`tabs n${pestañas.length}`}>
+        {pestañas.map(([k, icono, texto]) => (
+          <button key={k} class={`tab ${vista === k ? 'act' : ''}`} onClick={() => setVista(k)}>
+            {k === 'ayudas' && pedidos > 0 && <span class="dot">{pedidos}</span>}
+            <i>{icono}</i>
+            {texto}
+          </button>
+        ))}
       </nav>
     </div>
   )

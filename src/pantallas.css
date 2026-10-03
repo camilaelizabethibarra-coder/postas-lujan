@@ -426,3 +426,136 @@
   flex: none; display: flex; align-items: center; padding: 0 14px; border-radius: 12px;
   background: var(--sup2); color: var(--texto); font-weight: 700; font-size: 13px; text-decoration: none;
 }
+
+/* ------------------------------------------------------------------ */
+/* equipo: dos usuarios, ayudas, dónde están, pecheras                 */
+/* ------------------------------------------------------------------ */
+
+.usuario {
+  display: flex; flex-direction: column; gap: 3px; width: 100%; text-align: left; margin-bottom: 9px;
+  background: var(--sup); border: 2px solid var(--borde); border-radius: 14px; padding: 14px 16px;
+}
+.usuario b { font-size: 18px; }
+.usuario span { font-size: 13px; color: var(--tenue); line-height: 1.4; }
+.usuario.act { border-color: var(--celeste); background: var(--celeste-suave); }
+
+.tabs.n6 .tab { font-size: 10.5px; }
+.tabs.n6 .tab i { font-size: 17px; }
+.tab .dot {
+  width: auto; height: auto; min-width: 17px; padding: 1px 5px; top: 2px; right: calc(50% - 26px);
+  color: #fff; font-size: 11px; font-weight: 800; line-height: 15px;
+}
+
+/* ayudas */
+.pedido {
+  border-radius: 16px; padding: 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;
+  background: var(--alerta-suave); border: 2px solid var(--alerta);
+}
+.pedido.ayuda { border-color: #e2c41c; background: #fff8d6; color: #2b2100; }
+.pedido.resuelto { background: var(--sup); border-color: var(--borde); opacity: 0.75; }
+.pedido-tipo { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 800; font-size: 16px; flex-wrap: wrap; }
+.pedido-tipo span { font-size: 13px; font-weight: 600; opacity: 0.8; }
+.pedido-quien { display: flex; flex-direction: column; gap: 2px; }
+.pedido-quien b { font-size: 20px; }
+.pedido-quien span { font-size: 14px; }
+.pedido-acciones { display: flex; flex-direction: column; gap: 8px; }
+.pedido-acciones .btn { margin: 0; text-decoration: none; }
+.btn.mapa-grande { background: #1f6ba6; color: #fff; font-size: 17px; display: flex; flex-direction: column; gap: 2px; }
+.btn.mapa-grande small { font-size: 12px; font-weight: 500; opacity: 0.9; }
+.sin-ubic { font-size: 14px; background: rgba(0,0,0,0.06); border-radius: 10px; padding: 10px 12px; }
+.pedido-tels { display: flex; flex-direction: column; gap: 8px; }
+
+/* dónde están */
+.resumen { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 6px; }
+.res-t {
+  background: var(--sup); border: 1px solid var(--borde); border-radius: 14px; padding: 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.res-t b { font-size: 30px; line-height: 1; letter-spacing: -0.02em; }
+.res-t span { font-size: 13px; color: var(--tenue); font-weight: 600; }
+.res-t.ojo { border-color: var(--vela); }
+.res-t.ojo b { color: var(--vela); }
+.recorrido { position: relative; }
+.recorrido::before {
+  content: ''; position: absolute; left: 21px; top: 24px; bottom: 24px;
+  border-left: 4px dotted #8cc3e0;
+}
+.estacion { position: relative; margin-bottom: 8px; }
+.est-fila { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 6px 0; }
+.est-fila[disabled] { cursor: default; }
+.est-punto {
+  flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--sup2); border: 3px solid var(--fondo); font-weight: 800; font-size: 17px; position: relative;
+}
+.estacion.con .est-punto { background: #1f6ba6; color: #fff; box-shadow: 0 0 0 3px #f1e25c; }
+.estacion.atras .est-punto { background: var(--alerta); box-shadow: 0 0 0 3px var(--alerta-suave); }
+.est-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 13px; min-width: 0; }
+.est-txt b { font-size: 16px; }
+.estacion.atras .est-txt > span:nth-child(2) { color: var(--alerta); font-weight: 700; }
+.est-barra { height: 7px; background: var(--sup2); border-radius: 4px; overflow: hidden; margin: 3px 0 1px; }
+.est-barra i { display: block; height: 100%; background: #17703f; border-radius: 4px; }
+.est-ver { color: var(--tenue); font-size: 14px; padding: 0 4px; }
+.ruta-gente { margin: 2px 0 10px 58px; }
+.grp-tit { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 14px; font-weight: 650; padding: 10px 12px; background: var(--sup); border: 1px solid var(--borde); border-radius: 12px; }
+.grp-tit span:first-child { flex: 1; }
+.grp-tit em { font-style: normal; font-weight: 800; }
+.grp .ruta-gente { margin: 8px 0 0; }
+.per.pide { background: var(--alerta-suave); border-color: var(--alerta); font-weight: 700; }
+
+/* estado de cada uno en las listas */
+.estado-p { display: inline-block; font-size: 11.5px; font-weight: 800; padding: 1px 7px; border-radius: 999px; margin-right: 4px; }
+.estado-p.micro { background: #dceef8; color: #0f3f68; }
+.estado-p.baja { background: var(--alerta-suave); color: var(--alerta); }
+.estado-p.ayuda { background: #fff4b8; color: #4a3500; }
+.estado-p.luego { background: var(--sup2); color: var(--tenue); }
+
+/* parada actual, bien visible */
+.parada-actual { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.parada-actual span { font-size: 12px; color: var(--tenue); font-weight: 700; letter-spacing: 0.06em; }
+.parada-actual b { font-size: 22px; flex: 1; letter-spacing: -0.01em; }
+.parada-actual button { font-size: 13px; color: var(--celeste); font-weight: 700; padding: 6px 4px; }
+.elegir-parada { display: flex; flex-direction: column; gap: 7px; margin: 8px 0 4px; }
+.elegir-parada .btn { margin: 0; }
+.paso-a-paso { font-size: 13px; color: var(--tenue); margin: 4px 0 10px; line-height: 1.5; }
+
+/* pecheras */
+.modo { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.modo button { padding: 11px 6px; border-radius: 12px; background: var(--sup); border: 2px solid var(--borde); font-weight: 700; font-size: 14px; text-align: center; }
+.modo button.act { border-color: var(--celeste); background: var(--celeste-suave); color: var(--celeste); }
+.tarjeta-p {
+  border-radius: 16px; padding: 14px; margin-bottom: 10px; background: var(--sup);
+  border: 2px solid var(--borde); display: flex; flex-direction: column; gap: 6px;
+}
+.tarjeta-p.lista { border-color: #17703f; background: var(--ok-suave); }
+.tp-fila { display: flex; align-items: center; gap: 12px; }
+.tp-num {
+  flex: none; min-width: 74px; height: 74px; border-radius: 14px; background: #1f6ba6; color: #fff;
+  display: grid; place-items: center; font-size: 34px; font-weight: 800; letter-spacing: -0.03em; padding: 0 6px;
+}
+.tp-num.eq { background: #e2c41c; color: #0b1830; font-size: 15px; letter-spacing: 0.06em; }
+.tp-datos { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tp-datos b { font-size: 19px; line-height: 1.15; }
+.tp-datos span { font-size: 13px; color: var(--tenue); }
+.tp-estado { font-size: 14px; font-weight: 700; }
+.tarjeta-p .btn { margin: 0; }
+.por-salida { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-top: 8px; }
+.por-salida div { flex: none; background: var(--sup); border: 1px solid var(--borde); border-radius: 10px; padding: 6px 10px; font-size: 12px; }
+.por-salida b { display: block; font-size: 15px; }
+
+.como { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; }
+.como li { margin-bottom: 8px; }
+
+/* viandas: las especiales, bien a la vista */
+.especiales { background: #fff8d6; border: 2px solid #e2c41c; border-radius: 16px; padding: 12px; margin-bottom: 8px; color: #2b2100; }
+.esp-tit { font-weight: 800; font-size: 17px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.esp-tit span { font-size: 13px; font-weight: 700; }
+.vesp {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; margin-top: 7px;
+  background: #fff; border-radius: 12px; padding: 10px; border: 1px solid #e9d97a; color: #0b1830;
+}
+.vesp.dada { background: #e6f5ec; border-color: #9fd3b2; }
+.esp-tipo { flex: none; width: 92px; font-weight: 800; font-size: 13px; color: #6b4a00; line-height: 1.2; }
+.esp-quien { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.esp-quien b { font-size: 15px; }
+.esp-quien span { font-size: 12px; color: #5b7196; }
+.vesp.dada .mar { background: #17703f; border-color: #17703f; color: #fff; }

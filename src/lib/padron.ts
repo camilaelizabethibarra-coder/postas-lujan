@@ -7,8 +7,9 @@
  *
  * Dos cosas que hace este archivo y conviene no perder de vista:
  *
- * 1. Tira a la basura las columnas sensibles aunque se las peguen. DNI y
- *    pagos no entran a la app ni por accidente. La regla se aplica acá, en el
+ * 1. Tira a la basura las columnas de pagos aunque se las peguen: no entran
+ *    a la app ni por accidente. El DNI sí entra, pero la base solo se lo da
+ *    al equipo coordinador (para encontrar a cada uno al entregar pecheras). La regla se aplica acá, en el
  *    borde, en vez de confiar en que quien pega recorte bien. La comida
  *    (restricción alimentaria) sí entra, para entregar las viandas, pero la
  *    base la guarda donde solo la ve el equipo con PIN.
@@ -36,6 +37,10 @@ export type Fila = {
   comida: string | null
   /** La planilla trae la salida: la app no se la pregunta al peregrino. */
   salida_ok: boolean
+  /** Solo lo ve el equipo coordinador, para encontrar a cada uno en la parroquia. */
+  dni: string | null
+  /** La planilla dice que ya retiró la pechera. */
+  pechera_ok: boolean
   /** Arranca en el micro (por ejemplo, lesionado). Solo para la app, no va a la base. */
   en_micro?: boolean
 }
@@ -105,7 +110,7 @@ function detectarSeparador(linea: string): string {
 // --------------------------------------------------------------------------
 
 type Campo =
-  | 'numero' | 'apellido' | 'nombre' | 'micro' | 'tel' | 'tel_emerg' | 'nota' | 'salida' | 'comida'
+  | 'numero' | 'apellido' | 'nombre' | 'micro' | 'tel' | 'tel_emerg' | 'nota' | 'salida' | 'comida' | 'dni' | 'pechera'
   | 'DESCARTAR'
 
 /**
@@ -113,7 +118,8 @@ type Campo =
  * que reconocerse antes que "CEL" a secas.
  */
 const ENCABEZADOS: [RegExp, Campo][] = [
-  [/DNI|DOCUMENTO/, 'DESCARTAR'],
+  [/DNI|DOCUMENTO/, 'dni'],
+  [/PECHERA/, 'pechera'],
   [/\$|ABONA|PAGO|IMPORTE|SE(N|Ñ)A/, 'DESCARTAR'],
   [/EMERGENC/, 'tel_emerg'],
   [/NUMERO|^N(RO|°|º)?$|^#$/, 'numero'],
@@ -311,6 +317,8 @@ export function importar(pegado: string): Resultado {
       nota,
       activo: true,
       comida,
+      dni: leer('dni').replace(/\D/g, '') || null,
+      pechera_ok: /ENTREG|RETIR|^SI|^YA|^X$/.test(normalizar(leer('pechera'))),
       salida_ok: salida != null || tramo !== 'completo',
       en_micro: /MICRO/.test(normalizar(nota ?? '')) && /QUEDA|VA EN|VIAJA|ESGUINC|LESION/.test(normalizar(nota ?? '')),
     })

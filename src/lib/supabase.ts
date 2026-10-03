@@ -81,10 +81,25 @@ export async function sincronizarReloj(): Promise<void> {
 const PREFIJO = esDemo() ? 'postas-demo:' : 'postas:'
 const CLAVE_TOKEN = PREFIJO + 'token'
 const CLAVE_POSTA = PREFIJO + 'posta'
+const CLAVE_ROL = PREFIJO + 'rol'
 
-/** Solo para la demo, que no pide PIN. */
+export type Rol = 'coordinador' | 'servicio'
+
+/** Solo para la demo, que no pide PIN: entra como coordinador para ver todo. */
 export function entrarSinPin(posta: string): void {
   localStorage.setItem(CLAVE_TOKEN, 'demo')
+  localStorage.setItem(CLAVE_POSTA, posta)
+  localStorage.setItem(CLAVE_ROL, 'coordinador')
+}
+
+/** Con qué usuario entró este celular. Una sesión vieja (por posta) no tiene rol: vuelve a pedir PIN. */
+export function rolGuardado(): Rol | null {
+  const r = localStorage.getItem(CLAVE_ROL)
+  return r === 'coordinador' || r === 'servicio' ? r : null
+}
+
+/** La parada donde está parado este celular ahora. Se cambia desde la app, sin PIN. */
+export function guardarPosta(posta: string): void {
   localStorage.setItem(CLAVE_POSTA, posta)
 }
 
@@ -98,7 +113,16 @@ export function postaGuardada(): string | null {
 
 export function cerrarSesion(): void {
   localStorage.removeItem(CLAVE_TOKEN)
-  localStorage.removeItem(CLAVE_POSTA)
+  localStorage.removeItem(CLAVE_ROL)
+}
+
+export async function abrirRol(rol: Rol, pin: string): Promise<string> {
+  const db = await supa()
+  const { data, error } = await db.rpc('abrir_rol', { p_rol: rol, p_pin: pin })
+  if (error) throw new Error(error.message.includes('PIN') ? 'PIN incorrecto' : error.message)
+  localStorage.setItem(CLAVE_TOKEN, data as string)
+  localStorage.setItem(CLAVE_ROL, rol)
+  return data as string
 }
 
 export async function abrirPosta(posta: string, pin: string): Promise<string> {

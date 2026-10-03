@@ -83,6 +83,24 @@ export const SALIDAS: { tramo: string; nombre: string; cita: string }[] = [
  */
 export const POSTA_VIANDA: PostaFila = { id: 'vianda', orden: 90, nombre: 'Viandas' }
 
+/** Igual que las viandas: marcar acá es "le dimos la pechera" y "la devolvió al subir al micro". */
+export const POSTA_PECHERA: PostaFila = { id: 'pechera', orden: 91, nombre: 'Pechera entregada' }
+export const POSTA_DEVUELTA: PostaFila = { id: 'devuelta', orden: 92, nombre: 'Pechera devuelta' }
+
+/** La posta donde arranca cada uno: ahí queda presente cuando retira la pechera. */
+export function postaDeSalida(tramo: string): PostaFila {
+  const o = primeraPosta(tramo)
+  return POSTAS_POR_DEFECTO.find((p) => p.orden === o) ?? POSTAS_POR_DEFECTO[0]!
+}
+
+/** Dónde y cuándo retira la pechera cada uno, según desde dónde sale. */
+export function retiroDe(tramo: string): string {
+  if (tramo === 'liniers') return 'La retira en La Reja'
+  if (tramo === 'desde_reja' || tramo === 'desde_rodriguez') return '9:00 en la parroquia'
+  if (tramo === 'solo_vuelta') return 'No lleva pechera'
+  return '7:00 en la parroquia'
+}
+
 /** "CELIACA" → "Celíaca"; lo que no se reconoce queda como vino. null = sin restricción. */
 export function comidaDe(crudo: string | null | undefined): string | null {
   const t = (crudo ?? '').trim()
